@@ -1,0 +1,530 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@typeparam TItem
+
+<div class="rlv-datagrid w-full @Class" @attributes="AdditionalAttributes">
+
+    @* Toolbar Section *@
+    @if (ShowPageSizeSelector || (AllowFiltering && HasActiveFilters))
+    {
+        <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
+            @* Page Size Selector *@
+            @if (ShowPageSizeSelector)
+            {
+                <div class="flex items-center gap-2">
+                    <span class="text-sm">Show:</span>
+                    <select class="select select-bordered select-sm w-20" @onchange="HandlePageSizeChange">
+                        @foreach (var size in PageSizeOptions)
+                        {
+                            <option value="@size" selected="@(size == PageSize)">@size</option>
+                        }
+                    </select>
+                    <span class="text-sm">entries</span>
+                </div>
+            }
+
+            @* Clear Filters Button *@
+            @if (AllowFiltering && HasActiveFilters)
+            {
+                <RlvButton Size="ButtonSize.Small"
+                          Style="ButtonStyle.Ghost"
+                          OnClick="ClearAllFilters"
+                          class="ml-auto">
+                    <span class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Clear Filters
+                    </span>
+                </RlvButton>
+            }
+        </div>
+    }
+
+    @* Register Columns (Hidden) *@
+    <CascadingValue Value="this" IsFixed="true">
+        @Columns
+    </CascadingValue>
+
+    @* Loading State *@
+    @if (IsLoading)
+    {
+        <div class="w-full space-y-2">
+            @for (int i = 0; i < 5; i++)
+            {
+                <RlvSkeleton Height="48px" />
+            }
+        </div>
+    }
+    else if (ShowEmptyState)
+    {
+        @* Empty State *@
+        <div class="flex flex-col items-center justify-center py-12 px-4">
+            @if (EmptyContent != null)
+            {
+                @EmptyContent
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-base-content opacity-30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="text-base-content opacity-60 text-lg font-medium">@EmptyMessage</p>
+            }
+        </div>
+    }
+    else
+    {
+        @* Data Table *@
+        <RlvTable Size="Size"
+                 Zebra="Zebra"
+                 PinRows="PinHeader"
+                 OverflowWrapper="true"
+                 Class="w-full">
+            <thead>
+                @* Header Row *@
+                <tr>
+                    @foreach (var column in RegisteredColumns.Where(c => c.Visible))
+                    {
+                        <th class="@GetHeaderCssClass(column)"
+                            style="@GetHeaderStyle(column)"
+                            @onclick="async () => await HandleHeaderClick(column)">
+                            <div class="@GetHeaderContentCssClass(column)">
+                                @if (column.HeaderTemplate != null)
+                                {
+                                    @column.HeaderTemplate
+                                }
+                                else
+                                {
+                                    <span>@column.Title</span>
+                                }
+
+                                @* Sort Indicator *@
+                                @if (AllowSorting && column.Sortable && !string.IsNullOrEmpty(column.Property))
+                                {
+                                    var sortDir = GetSortDirection(column.Property);
+                                    <span class="ml-1 inline-block">
+                                        @if (sortDir == SortDirection.Ascending)
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                            </svg>
+                                        }
+                                        else if (sortDir == SortDirection.Descending)
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                            </svg>
+                                        }
+                                    </span>
+                                }
+                            </div>
+                        </th>
+                    }
+                </tr>
+
+                @* Filter Row *@
+                @if (AllowFiltering && RegisteredColumns.Any(c => c.Filterable && c.Visible))
+                {
+                    <tr class="bg-base-200">
+                        @foreach (var column in RegisteredColumns.Where(c => c.Visible))
+                        {
+                            <th class="@GetFilterCellCssClass(column)">
+                                @if (column.Filterable && !string.IsNullOrEmpty(column.Property))
+                                {
+                                    var currentFilterValue = GetFilterValue(column.Property);
+
+                                    @switch (column.FilterType)
+                                    {
+                                        case FilterType.Text:
+                                            <RlvInputField Type="text"
+                                                          Value="@currentFilterValue"
+                                                          Placeholder="Filter..."
+                                                          Size="InputFieldSize.Small"
+                                                          class="w-full"
+                                                          @oninput="async (e) => await HandleFilterChange(column.Property, e.Value?.ToString())" />
+                                            break;
+
+                                        case FilterType.Number:
+                                            <RlvInputField Type="number"
+                                                          Value="@currentFilterValue"
+                                                          Placeholder="Filter..."
+                                                          Size="InputFieldSize.Small"
+                                                          class="w-full"
+                                                          @oninput="async (e) => await HandleFilterChange(column.Property, e.Value?.ToString())" />
+                                            break;
+
+                                        case FilterType.Date:
+                                            <RlvInputField Type="date"
+                                                          Value="@currentFilterValue"
+                                                          Size="InputFieldSize.Small"
+                                                          class="w-full"
+                                                          @oninput="async (e) => await HandleFilterChange(column.Property, e.Value?.ToString())" />
+                                            break;
+
+                                        case FilterType.Select:
+                                            <select class="select select-bordered select-sm w-full" @onchange="async (e) => await HandleFilterChange(column.Property, e.Value?.ToString())">
+                                                <option value="">All</option>
+                                                @if (column.FilterOptions != null)
+                                                {
+                                                    @foreach (var option in column.FilterOptions)
+                                                    {
+                                                        <option value="@option.Value" selected="@(currentFilterValue == option.Value)">@option.Label</option>
+                                                    }
+                                                }
+                                            </select>
+                                            break;
+
+                                        case FilterType.Boolean:
+                                            <select class="select select-bordered select-sm w-full" @onchange="async (e) => await HandleFilterChange(column.Property, e.Value?.ToString())">
+                                                <option value="">All</option>
+                                                <option value="true" selected="@(currentFilterValue == "true")">Yes</option>
+                                                <option value="false" selected="@(currentFilterValue == "false")">No</option>
+                                            </select>
+                                            break;
+                                    }
+                                }
+                            </th>
+                        }
+                    </tr>
+                }
+            </thead>
+
+            <tbody>
+                @if (Data != null)
+                {
+                    @foreach (var item in Data)
+                    {
+                        <tr>
+                            @foreach (var column in RegisteredColumns.Where(c => c.Visible))
+                            {
+                                <td class="@GetCellCssClass(column)">
+                                    @if (column.Template != null)
+                                    {
+                                        @column.Template(item)
+                                    }
+                                    else if (!string.IsNullOrEmpty(column.Property))
+                                    {
+                                        @GetPropertyValue(item, column.Property)
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </RlvTable>
+    }
+
+    @* Pagination Section *@
+    @if (AllowPaging && !IsLoading && HasData)
+    {
+        <div class="flex flex-wrap gap-4 items-center justify-between mt-4">
+            @* Item Count Summary *@
+            @if (ShowItemCountSummary)
+            {
+                <div class="text-sm text-base-content opacity-70">
+                    Showing @FirstItemIndex-@LastItemIndex of @TotalCount items
+                </div>
+            }
+
+            @* Pagination Controls *@
+            <div class="flex items-center gap-2">
+                @* First Page *@
+                <RlvButton Size="ButtonSize.Small"
+                          Style="ButtonStyle.Ghost"
+                          Disabled="@(currentPage == 0)"
+                          OnClick="GoToFirstPage"
+                          class="join-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                </RlvButton>
+
+                @* Previous Page *@
+                <RlvButton Size="ButtonSize.Small"
+                          Style="ButtonStyle.Ghost"
+                          Disabled="@(currentPage == 0)"
+                          OnClick="GoToPreviousPage"
+                          class="join-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </RlvButton>
+
+                @* Page Numbers *@
+                <RlvPagination>
+                    @foreach (var pageIndex in GetVisiblePageNumbers())
+                    {
+                        @if (pageIndex == -1)
+                        {
+                            <span class="px-2">...</span>
+                        }
+                        else
+                        {
+                            <RlvButton Size="ButtonSize.Small"
+                                      Color="@(pageIndex == currentPage ? ButtonColor.Primary : ButtonColor.None)"
+                                      OnClick="async () => await GoToPage(pageIndex)"
+                                      class="join-item">
+                                @(pageIndex + 1)
+                            </RlvButton>
+                        }
+                    }
+                </RlvPagination>
+
+                @* Next Page *@
+                <RlvButton Size="ButtonSize.Small"
+                          Style="ButtonStyle.Ghost"
+                          Disabled="@(currentPage >= TotalPages - 1)"
+                          OnClick="GoToNextPage"
+                          class="join-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </RlvButton>
+
+                @* Last Page *@
+                <RlvButton Size="ButtonSize.Small"
+                          Style="ButtonStyle.Ghost"
+                          Disabled="@(currentPage >= TotalPages - 1)"
+                          OnClick="GoToLastPage"
+                          class="join-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </RlvButton>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // ========================================
+    // HELPER METHODS FOR RENDERING
+    // ========================================
+
+    /// <summary>
+    /// Get CSS classes for header cell.
+    /// </summary>
+    private string GetHeaderCssClass(RlvDataGridColumn<TItem> column)
+    {
+        var classes = new List<string>();
+
+        if (AllowSorting && column.Sortable && !string.IsNullOrEmpty(column.Property))
+        {
+            classes.Add("cursor-pointer");
+            classes.Add("select-none");
+            classes.Add("hover:bg-base-200");
+        }
+
+        if (column.Frozen)
+        {
+            classes.Add("sticky");
+            classes.Add("z-10");
+            classes.Add(column.FrozenPosition == FrozenPosition.Left ? "left-0" : "right-0");
+            classes.Add("bg-base-100");
+        }
+
+        if (!string.IsNullOrEmpty(column.HeaderClass))
+        {
+            classes.Add(column.HeaderClass);
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    /// <summary>
+    /// Get CSS classes for header content.
+    /// </summary>
+    private string GetHeaderContentCssClass(RlvDataGridColumn<TItem> column)
+    {
+        var classes = new List<string> { "flex", "items-center", "gap-1" };
+
+        classes.Add(column.TextAlign switch
+        {
+            TextAlign.Center => "justify-center",
+            TextAlign.Right => "justify-end",
+            _ => "justify-start"
+        });
+
+        return string.Join(" ", classes);
+    }
+
+    /// <summary>
+    /// Get inline style for header cell.
+    /// </summary>
+    private string? GetHeaderStyle(RlvDataGridColumn<TItem> column)
+    {
+        if (!string.IsNullOrEmpty(column.Width))
+        {
+            return $"width: {column.Width}; min-width: {column.Width};";
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Get CSS classes for filter cell.
+    /// </summary>
+    private string GetFilterCellCssClass(RlvDataGridColumn<TItem> column)
+    {
+        var classes = new List<string> { "py-2" };
+
+        if (column.Frozen)
+        {
+            classes.Add("sticky");
+            classes.Add("z-10");
+            classes.Add(column.FrozenPosition == FrozenPosition.Left ? "left-0" : "right-0");
+            classes.Add("bg-base-200");
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    /// <summary>
+    /// Get CSS classes for data cell.
+    /// </summary>
+    private string GetCellCssClass(RlvDataGridColumn<TItem> column)
+    {
+        var classes = new List<string>();
+
+        classes.Add(column.TextAlign switch
+        {
+            TextAlign.Center => "text-center",
+            TextAlign.Right => "text-right",
+            _ => "text-left"
+        });
+
+        if (column.Frozen)
+        {
+            classes.Add("sticky");
+            classes.Add("z-10");
+            classes.Add(column.FrozenPosition == FrozenPosition.Left ? "left-0" : "right-0");
+            classes.Add("bg-base-100");
+        }
+
+        if (!string.IsNullOrEmpty(column.CellClass))
+        {
+            classes.Add(column.CellClass);
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    /// <summary>
+    /// Handle header click (for sorting).
+    /// </summary>
+    private async Task HandleHeaderClick(RlvDataGridColumn<TItem> column)
+    {
+        if (AllowSorting && column.Sortable && !string.IsNullOrEmpty(column.Property))
+        {
+            await ToggleSort(column.Property);
+        }
+    }
+
+    /// <summary>
+    /// Handle page size change.
+    /// </summary>
+    private async Task HandlePageSizeChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int newSize))
+        {
+            await ChangePageSize(newSize);
+        }
+    }
+
+    /// <summary>
+    /// Handle filter change with debounce.
+    /// </summary>
+    private System.Threading.Timer? filterDebounceTimer;
+    private string? pendingFilterProperty;
+    private string? pendingFilterValue;
+
+    private async Task HandleFilterChange(string propertyName, string? value)
+    {
+        pendingFilterProperty = propertyName;
+        pendingFilterValue = value;
+
+        // Cancel previous timer
+        filterDebounceTimer?.Dispose();
+
+        // Set new timer (500ms debounce)
+        filterDebounceTimer = new System.Threading.Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await ApplyFilter(pendingFilterProperty!, pendingFilterValue);
+                await InvokeAsync(StateHasChanged);
+            });
+        }, null, 500, Timeout.Infinite);
+    }
+
+    /// <summary>
+    /// Get visible page numbers for pagination (with ellipsis).
+    /// </summary>
+    private List<int> GetVisiblePageNumbers()
+    {
+        const int maxVisible = 5;
+        var pages = new List<int>();
+
+        if (TotalPages <= maxVisible + 2)
+        {
+            // Show all pages
+            for (int i = 0; i < TotalPages; i++)
+            {
+                pages.Add(i);
+            }
+        }
+        else
+        {
+            // Show first, last, current, and nearby pages with ellipsis
+            pages.Add(0); // First page
+
+            if (currentPage > 2)
+            {
+                pages.Add(-1); // Ellipsis
+            }
+
+            int start = Math.Max(1, currentPage - 1);
+            int end = Math.Min(TotalPages - 2, currentPage + 1);
+
+            for (int i = start; i <= end; i++)
+            {
+                if (!pages.Contains(i))
+                {
+                    pages.Add(i);
+                }
+            }
+
+            if (currentPage < TotalPages - 3)
+            {
+                pages.Add(-1); // Ellipsis
+            }
+
+            pages.Add(TotalPages - 1); // Last page
+        }
+
+        return pages;
+    }
+
+    /// <summary>
+    /// Get property value from an object using reflection.
+    /// </summary>
+    private object? GetPropertyValue(TItem item, string propertyName)
+    {
+        if (item == null || string.IsNullOrEmpty(propertyName))
+            return null;
+
+        var property = typeof(TItem).GetProperty(propertyName);
+        return property?.GetValue(item);
+    }
+
+    public void Dispose()
+    {
+        filterDebounceTimer?.Dispose();
+    }
+}

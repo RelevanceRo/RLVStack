@@ -22,9 +22,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="Mapster" Version="7.4.0" />
-
-		<PackageReference Include="Bit.BlazorUI.Extras" Version="9.8.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.9" />
 
 
 
@@ -40,7 +38,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
 		<PackageReference Include="Microsoft.Kiota.Bundle" Version="1.20.1" />
-		<PackageReference Include="Radzen.Blazor" Version="7.0.8" />
+		<PackageReference Include="Radzen.Blazor" Version="8.0.4" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.0" />
 		<PackageReference Include="System.Net.Http.Json" Version="9.0.5" />
 
@@ -48,10 +46,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-  
-   
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.5" />
-    
+    <Folder Include="Docs\" />
   </ItemGroup>
 
 </Project>

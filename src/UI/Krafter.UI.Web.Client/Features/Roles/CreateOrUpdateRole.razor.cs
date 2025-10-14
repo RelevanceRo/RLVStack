@@ -1,11 +1,11 @@
-﻿using Krafter.Api.Client;
+using Krafter.Api.Client;
 using Krafter.Api.Client.Models;
 using Krafter.UI.Web.Client.Common.Permissions;
 using Mapster;
 
 namespace Krafter.UI.Web.Client.Features.Roles;
 
-public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterClient krafterClient,  NotificationService notificationService) : ComponentBase
+public partial class CreateOrUpdateRole(DialogService dialogService, KrafterClient krafterClient, NotificationService notificationService) : ComponentBase
 {
     IEnumerable<string> selectedStandards;
 
@@ -20,7 +20,7 @@ public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterCli
 
         public bool IsGroup
         {
-            get { return Resource != null; }
+            get { return Resource != null && string.IsNullOrEmpty(FinalPermission); }
         }
     }
 
@@ -28,13 +28,23 @@ public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterCli
     CreateOrUpdateRoleRequest CreateUserRequest = new CreateOrUpdateRoleRequest();
     CreateOrUpdateRoleRequest OriginalCreateUserRequest = new CreateOrUpdateRoleRequest();
     public List<KrafterPermission> AllRoles { get; set; }
-    //  public List<string> SelectedRolesId { get; set; } = new List<string>();
     IEnumerable<GroupPermissionData> GroupedData = new List<GroupPermissionData>();
 
     private bool isBusy = false;
 
     private bool KeyPosition;
     private bool ProcessOwner;
+
+    // Property for multi-select binding
+    private string[] SelectedPermissions
+    {
+        get => CreateUserRequest.Permissions?.ToArray() ?? Array.Empty<string>();
+        set
+        {
+            CreateUserRequest.Permissions = value?.ToList() ?? new List<string>();
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,17 +54,32 @@ public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterCli
             OriginalCreateUserRequest = UserDetails.Adapt<CreateOrUpdateRoleRequest>();
             if (!string.IsNullOrWhiteSpace(UserDetails.Id))
             {
-                GroupedData = KrafterPermissions.All.GroupBy(c => c.Resource)
-                    .SelectMany(i => new GroupPermissionData[] { new GroupPermissionData() { Resource = i.Key } }
-                        .Concat(i.Select(o =>
-                            new GroupPermissionData()
-                            {
-                                Description = o.Description,
-                                Action = o.Action,
-                                IsBasic = o.IsBasic,
-                                IsRoot = o.IsRoot,
-                                FinalPermission = KrafterPermission.NameFor(o.Action, o.Resource)
-                            }))).ToList();
+                // Build grouped data with proper group headers
+                var groupedList = new List<GroupPermissionData>();
+                var permissionsByResource = KrafterPermissions.All.GroupBy(c => c.Resource);
+
+                foreach (var group in permissionsByResource)
+                {
+                    // Add group header
+                    groupedList.Add(new GroupPermissionData { Resource = group.Key, FinalPermission = "" });
+
+                    // Add permissions in group
+                    foreach (var permission in group)
+                    {
+                        groupedList.Add(new GroupPermissionData
+                        {
+                            Description = permission.Description,
+                            Action = permission.Action,
+                            Resource = null, // Clear resource for non-group items
+                            IsBasic = permission.IsBasic,
+                            IsRoot = permission.IsRoot,
+                            FinalPermission = KrafterPermission.NameFor(permission.Action, permission.Resource)
+                        });
+                    }
+                }
+
+                GroupedData = groupedList;
+
                 RoleDto? roleWithPermissions =
                     (await krafterClient.Roles.GetByIdWithPermissions[UserDetails.Id].GetAsync())?.Data;
                 CreateUserRequest.Permissions = roleWithPermissions is { Permissions: not null }
@@ -88,8 +113,6 @@ public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterCli
                     finalInput.Description = input.Description;
                 }
 
-               
-
                 if (!input.Permissions.ToHashSet().SetEquals(OriginalCreateUserRequest.Permissions))
                 {
                     finalInput.Permissions = input.Permissions;
@@ -98,7 +121,7 @@ public partial class CreateOrUpdateRole(DialogService dialogService,  KrafterCli
             var result = await krafterClient.Roles.CreateOrUpdate.PostAsync(finalInput);
             isBusy = false;
             StateHasChanged();
-            if (result is null || result is {IsError:true})
+            if (result is null || result is { IsError: true })
             {
                 if (string.IsNullOrWhiteSpace(input.Id))
                 {

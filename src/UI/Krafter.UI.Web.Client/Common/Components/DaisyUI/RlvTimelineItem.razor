@@ -1,0 +1,30 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<li @attributes="AdditionalAttributes">
+    @if (ShowConnectorBefore)
+    {
+        <hr />
+    }
+    @if (StartContent != null)
+    {
+        <div class="timeline-start @(UseBox ? "timeline-box" : "")">
+            @StartContent
+        </div>
+    }
+    @if (MiddleContent != null)
+    {
+        <div class="timeline-middle">
+            @MiddleContent
+        </div>
+    }
+    @if (EndContent != null)
+    {
+        <div class="timeline-end @(UseBox ? "timeline-box" : "")">
+            @EndContent
+        </div>
+    }
+    @if (ShowConnectorAfter)
+    {
+        <hr />
+    }
+</li>

@@ -1,0 +1,24 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<bool>
+
+@if (!string.IsNullOrEmpty(Label))
+{
+    <label class="label cursor-pointer">
+        <input type="checkbox"
+               class="@CssClass"
+               checked="@CurrentValue"
+               @onchange="HandleChange"
+               disabled="@(AdditionalAttributes?.ContainsKey("disabled") == true)"
+               @attributes="AdditionalAttributes" />
+        <span class="label-text">@Label</span>
+    </label>
+}
+else
+{
+    <input type="checkbox"
+           class="@CssClass"
+           checked="@CurrentValue"
+           @onchange="HandleChange"
+           disabled="@(AdditionalAttributes?.ContainsKey("disabled") == true)"
+           @attributes="AdditionalAttributes" />
+}

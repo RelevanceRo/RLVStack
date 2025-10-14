@@ -1,0 +1,10 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<string?>
+
+<textarea class="textarea @CssClass"
+          value="@CurrentValue"
+          placeholder="@Placeholder"
+          rows="@Rows"
+          @attributes="AdditionalAttributes"
+          @oninput="HandleInput">
+</textarea>

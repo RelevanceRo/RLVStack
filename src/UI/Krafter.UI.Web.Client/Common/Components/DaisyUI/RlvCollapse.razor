@@ -1,0 +1,78 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (UseDetails)
+{
+    <details class="collapse @CssClass" @attributes="DetailsAttributes">
+        <summary class="collapse-title @TitleClass">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                @Title
+            }
+            else
+            {
+                @TitleContent
+            }
+        </summary>
+        <div class="collapse-content @ContentClass">
+            @if (!string.IsNullOrEmpty(Content))
+            {
+                @Content
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    </details>
+}
+else if (UseCheckbox)
+{
+    <div class="collapse @CssClass" @attributes="AdditionalAttributes">
+        <input type="checkbox" checked="@IsOpen" @onchange="HandleCheckboxChange" class="@CheckboxClass" />
+        <div class="collapse-title @TitleClass">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                @Title
+            }
+            else
+            {
+                @TitleContent
+            }
+        </div>
+        <div class="collapse-content @ContentClass">
+            @if (!string.IsNullOrEmpty(Content))
+            {
+                @Content
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div tabindex="0" class="collapse @CssClass" @attributes="AdditionalAttributes">
+        <div class="collapse-title @TitleClass">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                @Title
+            }
+            else
+            {
+                @TitleContent
+            }
+        </div>
+        <div class="collapse-content @ContentClass">
+            @if (!string.IsNullOrEmpty(Content))
+            {
+                @Content
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    </div>
+}

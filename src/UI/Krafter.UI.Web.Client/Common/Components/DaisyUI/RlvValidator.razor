@@ -1,0 +1,9 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="@ContainerClass">
+    @ChildContent
+    @if (!string.IsNullOrEmpty(Hint))
+    {
+        <div class="validator-hint @HintClass">@Hint</div>
+    }
+</div>

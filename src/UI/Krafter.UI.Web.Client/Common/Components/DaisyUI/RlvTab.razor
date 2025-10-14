@@ -1,0 +1,55 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (UseRadio)
+{
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="tab @CssClass" @attributes="AdditionalAttributes">
+            <input type="radio" name="@Name" checked="@IsActive" />
+            @Label
+        </label>
+    }
+    else
+    {
+        <input type="radio" name="@Name" class="tab @CssClass" checked="@IsActive" aria-label="@AriaLabel" @attributes="AdditionalAttributes" />
+    }
+    @if (Content != null || ChildContent != null)
+    {
+        <div class="tab-content @ContentClass">
+            @if (Content != null)
+            {
+                @Content
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    }
+}
+else if (!string.IsNullOrEmpty(Href))
+{
+    <a href="@Href" role="tab" class="tab @CssClass" @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+        else
+        {
+            @ChildContent
+        }
+    </a>
+}
+else
+{
+    <button type="button" role="tab" class="tab @CssClass" @onclick="HandleClick" @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+        else
+        {
+            @ChildContent
+        }
+    </button>
+}

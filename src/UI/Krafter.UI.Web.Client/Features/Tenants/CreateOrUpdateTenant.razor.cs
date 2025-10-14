@@ -1,88 +1,95 @@
-﻿using Krafter.Api.Client;
+using Krafter.Api.Client;
 using Krafter.Api.Client.Models;
 using Mapster;
 
-namespace Krafter.UI.Web.Client.Features.Tenants
+namespace Krafter.UI.Web.Client.Features.Tenants;
+
+public partial class CreateOrUpdateTenant(
+    DialogService dialogService,
+    KrafterClient krafterClient
+    ) : ComponentBase
 {
-    public partial class CreateOrUpdateTenant(
-        DialogService dialogService,
-        KrafterClient krafterClient
-        ):ComponentBase
+    [Parameter] public TenantDto? TenantInput { get; set; } = new();
+
+    CreateOrUpdateTenantRequestInput CreateRequest = new();
+    CreateOrUpdateTenantRequestInput OriginalCreateRequest = new();
+    private bool isBusy = false;
+
+    public List<TableToCopy> TablesToCopyList { get; set; } = TablesToCopy.Data;
+    public List<string> SelectedTables { get; set; } = new();
+
+    // Helper property to convert DateTimeOffset? to DateTime? for InputDate
+    private DateTime? ValidUptoDate
     {
-        [Parameter] public TenantDto? TenantInput { get; set; } = new();
-        CreateOrUpdateTenantRequestInput CreateRequest = new();
-        CreateOrUpdateTenantRequestInput OriginalCreateRequest = new();
-        private bool isBusy = false;
+        get => CreateRequest.ValidUpto?.DateTime;
+        set => CreateRequest.ValidUpto = value.HasValue ? new DateTimeOffset(value.Value, TimeSpan.Zero) : null;
+    }
 
-        public List<TableToCopy> TablesToCopyList { get; set; } = TablesToCopy.Data;
-        public List<string> SelectedTables { get; set; } = new ();
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        if (TenantInput is { })
         {
-            if (TenantInput is { })
-            {
-                CreateRequest = TenantInput.Adapt<CreateOrUpdateTenantRequestInput>();
-                OriginalCreateRequest = TenantInput.Adapt<CreateOrUpdateTenantRequestInput>();
-            }
+            CreateRequest = TenantInput.Adapt<CreateOrUpdateTenantRequestInput>();
+            OriginalCreateRequest = TenantInput.Adapt<CreateOrUpdateTenantRequestInput>();
         }
+    }
 
-        async void Submit(CreateOrUpdateTenantRequestInput input)
+    async Task Submit()
+    {
+        if (TenantInput is not null)
         {
-            if (TenantInput is not null)
-            {
-                isBusy = true;
-                CreateOrUpdateTenantRequestInput finalInput = new();
-                if (string.IsNullOrWhiteSpace(input.Id))
-                {
-                    if (string.IsNullOrWhiteSpace(input.Id))
-                    {
-                        SelectedTables??=new List<string>();
-                        input.TablesToCopy = string.Join(",", SelectedTables);;
-                    }
-                    finalInput = input;
-                }
-                else
-                {
-                    finalInput.Id = input.Id;
-                    if (input.Name != OriginalCreateRequest.Name)
-                    {
-                        finalInput.Name = input.Name;
-                    }
-                    if (input.Identifier != OriginalCreateRequest.Identifier)
-                    {
-                        finalInput.Identifier = input.Identifier;
-                    }
-                    if (input.IsActive != OriginalCreateRequest.IsActive)
-                    {
-                        finalInput.IsActive = input.IsActive;
-                    }
-                    if (input.ValidUpto != OriginalCreateRequest.ValidUpto)
-                    {
-                        finalInput.ValidUpto = input.ValidUpto;
-                    }
-                    //we do not need int he case of update
-                    // if (input.TablesToCopy != OriginalCreateRequest.TablesToCopy)
-                    // {
-                    //     finalInput.TablesToCopy = input.TablesToCopy;
-                    // }
-                }
+            isBusy = true;
+            StateHasChanged();
 
-                var result = await krafterClient.Tenants.CreateOrUpdate.PostAsync(finalInput); //await tenantService.CreateOrUpdateAsync(finalInput);
-                isBusy = false;
-                StateHasChanged();
-                if (result is{ IsError:false})
-                {
-                    dialogService.Close(true);
-                }
+            CreateOrUpdateTenantRequestInput finalInput = new();
+
+            if (string.IsNullOrWhiteSpace(CreateRequest.Id))
+            {
+                // Creating new tenant
+                SelectedTables ??= new List<string>();
+                CreateRequest.TablesToCopy = string.Join(",", SelectedTables);
+                finalInput = CreateRequest;
             }
             else
             {
-                dialogService.Close(false);
+                // Updating existing tenant - only send changed fields
+                finalInput.Id = CreateRequest.Id;
+
+                if (CreateRequest.Name != OriginalCreateRequest.Name)
+                {
+                    finalInput.Name = CreateRequest.Name;
+                }
+                if (CreateRequest.Identifier != OriginalCreateRequest.Identifier)
+                {
+                    finalInput.Identifier = CreateRequest.Identifier;
+                }
+                if (CreateRequest.IsActive != OriginalCreateRequest.IsActive)
+                {
+                    finalInput.IsActive = CreateRequest.IsActive;
+                }
+                if (CreateRequest.ValidUpto != OriginalCreateRequest.ValidUpto)
+                {
+                    finalInput.ValidUpto = CreateRequest.ValidUpto;
+                }
+            }
+
+            var result = await krafterClient.Tenants.CreateOrUpdate.PostAsync(finalInput);
+            isBusy = false;
+            StateHasChanged();
+
+            if (result is { IsError: false })
+            {
+                dialogService.Close(true);
             }
         }
-
-        void Cancel()
+        else
         {
             dialogService.Close(false);
         }
+    }
+
+    void Cancel()
+    {
+        dialogService.Close(false);
     }
 }

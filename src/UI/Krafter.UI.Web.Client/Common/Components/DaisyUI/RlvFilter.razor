@@ -1,0 +1,14 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (UseForm)
+{
+    <form class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </form>
+}
+else
+{
+    <div class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}

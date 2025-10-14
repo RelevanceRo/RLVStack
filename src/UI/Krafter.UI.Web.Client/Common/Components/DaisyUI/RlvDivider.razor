@@ -1,0 +1,12 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="divider @CssClass" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        @Text
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>

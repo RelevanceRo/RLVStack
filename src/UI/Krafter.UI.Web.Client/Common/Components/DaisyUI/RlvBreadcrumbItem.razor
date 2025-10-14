@@ -1,0 +1,43 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<li @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Href))
+    {
+        <a href="@Href" @onclick="HandleClick" class="@ItemClass">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </a>
+    }
+    else if (OnClick.HasDelegate)
+    {
+        <span @onclick="HandleClick" class="hover:underline cursor-pointer inline-flex gap-2 items-center @ItemClass">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </span>
+    }
+    else
+    {
+        <span class="inline-flex gap-2 items-center @ItemClass">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </span>
+    }
+</li>

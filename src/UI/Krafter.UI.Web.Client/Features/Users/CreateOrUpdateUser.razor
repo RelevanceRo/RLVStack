@@ -1,79 +1,103 @@
 ﻿@using Krafter.Api.Client.Models
 @using Krafter.UI.Web.Client.Features.Roles._Shared
 @using Krafter.UI.Web.Client.Features.Users
-<RadzenTemplateForm Data="@CreateUserRequest" Submit="@(( CreateUserRequest __)=> Submit(__))">
-    <FluentValidationValidator  Options="@(options => options.IncludeAllRuleSets())"/>
-    <RadzenStack>
+@using Krafter.UI.Web.Client.Common.Components.DaisyUI
 
+<form @onsubmit="@(() => Submit(CreateUserRequest))" class="flex flex-col gap-4">
+    <FluentValidationValidator Options="@(options => options.IncludeAllRuleSets())" />
 
-        <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenColumn Size="12" SizeMD="2">
-                <RadzenLabel Text="First Name" Component="FirstName" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="10">
-                <RadzenTextBox Style="width: 100%" @bind-Value="@CreateUserRequest.FirstName" Name="FirstName" />
-            </RadzenColumn>
-            <ValidationMessage style="font-size: 13px" For="@(() => CreateUserRequest.FirstName)" />
-        </RadzenRow>
+    <div class="grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-12 md:col-span-2">
+            <RlvLabel Text="First Name" For="FirstName" />
+        </div>
+        <div class="col-span-12 md:col-span-10">
+            <RlvInputField @bind-Value="@CreateUserRequest.FirstName"
+                           Placeholder="Enter first name"
+                           Type="text"
+                           class="w-full" />
+            <ValidationMessage class="text-sm text-error" For="@(() => CreateUserRequest.FirstName)" />
+        </div>
+    </div>
 
+    <div class="grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-12 md:col-span-2">
+            <RlvLabel Text="Last Name" For="LastName" />
+        </div>
+        <div class="col-span-12 md:col-span-10">
+            <RlvInputField @bind-Value="@CreateUserRequest.LastName"
+                           Placeholder="Enter last name"
+                           Type="text"
+                           class="w-full" />
+            <ValidationMessage class="text-sm text-error" For="@(() => CreateUserRequest.LastName)" />
+        </div>
+    </div>
 
+    <div class="grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-12 md:col-span-2">
+            <RlvLabel Text="Phone Number" For="PhoneNumber" />
+        </div>
+        <div class="col-span-12 md:col-span-10">
+            <RlvInputField @bind-Value="@CreateUserRequest.PhoneNumber"
+                           Placeholder="Enter phone number"
+                           Type="tel"
+                           class="w-full" />
+            <ValidationMessage class="text-sm text-error" For="@(() => CreateUserRequest.PhoneNumber)" />
+        </div>
+    </div>
 
-         <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenColumn Size="12" SizeMD="2">
-                <RadzenLabel Text="Last Name" Component="LastName" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="10">
-                <RadzenTextBox Style="width: 100%" @bind-Value="@CreateUserRequest.LastName" Name="LastName" />
-            </RadzenColumn>
-            <ValidationMessage style="font-size: 13px" For="@(() => CreateUserRequest.LastName)" />
-        </RadzenRow>
+    @if (!string.IsNullOrWhiteSpace(UserInput.Id))
+    {
+        <div class="grid grid-cols-12 gap-4 items-center">
+            <div class="col-span-12 md:col-span-2">
+                <RlvLabel Text="Roles" For="Roles" />
+            </div>
+            <div class="col-span-12 md:col-span-10">
+                <MultiSelectRoleDropDownDataGrid @bind-Value="@CreateUserRequest.Roles"></MultiSelectRoleDropDownDataGrid>
+                <ValidationMessage class="text-sm text-error" For="@(() => CreateUserRequest.Roles)" />
+            </div>
+        </div>
+    }
 
+    <div class="grid grid-cols-12 gap-4 items-center">
+        <div class="col-span-12 md:col-span-2">
+            <RlvLabel Text="Email" For="Email" />
+        </div>
+        <div class="col-span-12 md:col-span-10">
+            <RlvInputField @bind-Value="@CreateUserRequest.Email"
+                           Placeholder="Enter email address"
+                           Type="email"
+                           class="w-full" />
+            <ValidationMessage class="text-sm text-error" For="@(() => CreateUserRequest.Email)" />
+        </div>
+    </div>
 
-
-        <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenColumn Size="12" SizeMD="2">
-                <RadzenLabel Text="Phone Number" Component="PhoneNumber" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="10">
-                <RadzenTextBox Style="width: 100%" @bind-Value="@CreateUserRequest.PhoneNumber" Name="PhoneNumber" />
-            </RadzenColumn>
-            <ValidationMessage style="font-size: 13px" For="@(() => CreateUserRequest.PhoneNumber)" />
-        </RadzenRow>
-
-        @if (!string.IsNullOrWhiteSpace(UserInput.Id))
-        {
-            
-            <RadzenRow AlignItems="AlignItems.Center">
-                <RadzenColumn Size="12" SizeMD="2">
-                    <RadzenLabel Text="Roles" Component="Roles" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="10">
-                    <MultiSelectRoleDropDownDataGrid @bind-Value="@CreateUserRequest.Roles"></MultiSelectRoleDropDownDataGrid>
-                </RadzenColumn>
-                <ValidationMessage style="font-size: 13px" For="@(() => CreateUserRequest.Roles)" />
-            </RadzenRow>
-        }
-
-
-        <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenColumn Size="12" SizeMD="2">
-                <RadzenLabel Text="Email" Component="Email" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="10">
-                <RadzenTextBox Style="width: 100%" @bind-Value="@CreateUserRequest.Email" Name="Email" />              
-            </RadzenColumn>
-            <ValidationMessage style="font-size: 13px" For="@(() => CreateUserRequest.Email)" />
-        </RadzenRow>
-
-
-
-       
-      
-    </RadzenStack>
-    
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
-        <RadzenButton ButtonType="ButtonType.Submit" IsBusy="isBusy" Size="ButtonSize.Medium" Icon="save" Text="Save" />
-        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Icon="cancel" Text="Cancel" Click="@Cancel" />
-    </RadzenStack>
-</RadzenTemplateForm>
+    <div class="flex flex-row justify-center gap-4 mt-8 mb-4">
+        <RlvButton Type="submit"
+                   Size="ButtonSize.Medium"
+                   Color="ButtonColor.Primary"
+                   Text="Save"
+                   Disabled="@isBusy">
+            @if (isBusy)
+            {
+                <RlvLoading Size="LoadingSize.Small" />
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+            }
+        </RlvButton>
+        <RlvButton Type="button"
+                   Size="ButtonSize.Medium"
+                   Color="ButtonColor.Neutral"
+                   Variant="ButtonVariant.Ghost"
+                   Text="Cancel"
+                   OnClick="@Cancel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </RlvButton>
+    </div>
+</form>
 

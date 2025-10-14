@@ -1,0 +1,27 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="avatar @CssClass" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Src))
+    {
+        <div class="@InnerClass">
+            <img src="@Src" alt="@Alt" />
+        </div>
+    }
+    else if (Placeholder)
+    {
+        <div class="@InnerClass">
+            @if (!string.IsNullOrEmpty(PlaceholderText))
+            {
+                <span class="@PlaceholderTextClass">@PlaceholderText</span>
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>

@@ -1,0 +1,11 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="@CssClass" data-tip="@Tip" @attributes="AdditionalAttributes">
+    @if (TipContent != null)
+    {
+        <div class="tooltip-content">
+            @TipContent
+        </div>
+    }
+    @ChildContent
+</div>

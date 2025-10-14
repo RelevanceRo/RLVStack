@@ -60,6 +60,19 @@
                 return "brand/loading-indicators/loading-indicator-m.svg";
             }
         }
+
+        private string GetSizeClass()
+        {
+            return Size switch
+            {
+                LoadingIndicatorSize.ExtraSmall => "h-4 w-4",
+                LoadingIndicatorSize.Small => "h-6 w-6",
+                LoadingIndicatorSize.Medium => "h-8 w-8",
+                LoadingIndicatorSize.Large => "h-12 w-12",
+                LoadingIndicatorSize.ExtraLarge => "h-16 w-16",
+                _ => "h-8 w-8"
+            };
+        }
     }
 
     public enum LoadingIndicatorSize

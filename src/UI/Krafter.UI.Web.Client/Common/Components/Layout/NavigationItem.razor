@@ -1,24 +1,51 @@
-﻿
-@if (!Example.New && !Example.Updated)
-{
-    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@GetUrl()" aria-label="@Example.Name">
-       
-        <Template>
-            <img src="@($"svg/icons/{Example.Icon}.svg")" />
-            @Example.Name
-        </Template>
+﻿@using Krafter.UI.Web.Client.Common.Components.DaisyUI
 
-        <ChildContent>@ChildContent</ChildContent>
-    </RadzenPanelMenuItem>
+@if (ChildContent != null)
+{
+    <RlvMenuItem HasSubmenu="true" SubmenuOpen="@Expanded">
+        <SummaryContent>
+            @if (!Example.New && !Example.Updated)
+            {
+                <img src="@($"svg/icons/{Example.Icon}.svg")" class="w-5 h-5" />
+                <span>@Example.Name</span>
+            }
+            else
+            {
+                <span>@Example.Name</span>
+                @if (Example.Updated)
+                {
+                    <RlvBadge Text="Updated" Color="BadgeColor.Info" Size="BadgeSize.Small" />
+                }
+                @if (Example.New)
+                {
+                    <RlvBadge Text="New" Color="BadgeColor.Success" Size="BadgeSize.Small" />
+                }
+            }
+        </SummaryContent>
+        <SubmenuContent>
+            @ChildContent
+        </SubmenuContent>
+    </RlvMenuItem>
 }
 else
 {
-    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@GetUrl()" Icon="@Example.Icon" aria-label="@Example.Name">
-        <Template>
-            @Example.Name
-            <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info" />
-            <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success" />
-        </Template>
-        <ChildContent>@ChildContent</ChildContent>
-    </RadzenPanelMenuItem>
+    <RlvMenuItem Href="@GetUrl()" ItemClass="@GetItemClass()">
+        @if (!Example.New && !Example.Updated)
+        {
+            <img src="@($"svg/icons/{Example.Icon}.svg")" class="w-5 h-5" />
+            <span>@Example.Name</span>
+        }
+        else
+        {
+            <span>@Example.Name</span>
+            @if (Example.Updated)
+            {
+                <RlvBadge Text="Updated" Color="BadgeColor.Info" Size="BadgeSize.Small" />
+            }
+            @if (Example.New)
+            {
+                <RlvBadge Text="New" Color="BadgeColor.Success" Size="BadgeSize.Small" />
+            }
+        }
+    </RlvMenuItem>
 }

@@ -1,0 +1,40 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (Method == DropdownMethod.DetailsSummary)
+{
+    <details class="@CssClass" @attributes="AdditionalAttributes">
+        <summary class="@ButtonClass">
+            @ButtonContent
+        </summary>
+        <div class="@ContentCssClass">
+            @Content
+        </div>
+    </details>
+}
+else if (Method == DropdownMethod.PopoverApi)
+{
+    <button class="@ButtonClass"
+            popovertarget="@PopoverId"
+            style="anchor-name:--@AnchorName"
+            @attributes="ButtonAttributes">
+        @ButtonContent
+    </button>
+    <div popover
+         id="@PopoverId"
+         style="position-anchor:--@AnchorName"
+         class="@ContentCssClass"
+         @attributes="ContentAttributes">
+        @Content
+    </div>
+}
+else
+{
+    <div class="@CssClass" @attributes="AdditionalAttributes">
+        <div tabindex="0" role="button" class="@ButtonClass" @attributes="ButtonAttributes">
+            @ButtonContent
+        </div>
+        <div tabindex="-1" class="@ContentCssClass" @attributes="ContentAttributes">
+            @Content
+        </div>
+    </div>
+}

@@ -1,0 +1,19 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@*
+  Note: This component represents the "label" class in DaisyUI.
+  For standalone labels, use <p class="label">text</p>
+  For floating labels, this wraps input + span
+  For inline labels, use as span inside <label class="input">
+*@
+
+<span class="@CssClass" @attributes="AdditionalAttributes">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrEmpty(Text))
+    {
+        @Text
+    }
+</span>

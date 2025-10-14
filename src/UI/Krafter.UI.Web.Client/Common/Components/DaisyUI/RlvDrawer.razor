@@ -1,0 +1,18 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="@CssClass" @attributes="AdditionalAttributes">
+    <input id="@Id"
+           type="checkbox"
+           class="drawer-toggle"
+           checked="@IsOpen"
+           @onchange="HandleToggleChange" />
+
+    <div class="@ContentCssClass">
+        @Content
+    </div>
+
+    <div class="@SideCssClass">
+        <label for="@Id" aria-label="close sidebar" class="drawer-overlay"></label>
+        @SideContent
+    </div>
+</div>

@@ -1,0 +1,72 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<li class="@CssClass" @attributes="AdditionalAttributes">
+    @if (IsTitle)
+    {
+        <span class="menu-title">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </span>
+    }
+    else if (HasSubmenu)
+    {
+        <details @attributes="DetailsAttributes">
+            <summary>
+                @if (!string.IsNullOrEmpty(Text))
+                {
+                    @Text
+                }
+                else
+                {
+                    @SummaryContent
+                }
+            </summary>
+            <ul>
+                @SubmenuContent
+            </ul>
+        </details>
+    }
+    else if (!string.IsNullOrEmpty(Href))
+    {
+        <a href="@Href" @onclick="HandleClick">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </a>
+    }
+    else if (OnClick.HasDelegate)
+    {
+        <button type="button" @onclick="HandleClick">
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                @Text
+            }
+            else
+            {
+                @ChildContent
+            }
+        </button>
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+        else
+        {
+            @ChildContent
+        }
+    }
+</li>

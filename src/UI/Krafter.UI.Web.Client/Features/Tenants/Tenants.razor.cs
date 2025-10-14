@@ -1,24 +1,25 @@
-﻿using Krafter.Api.Client;
+using Krafter.Api.Client;
 using Krafter.Api.Client.Models;
 using Krafter.UI.Web.Client.Common.Constants;
 using Krafter.UI.Web.Client.Common.Permissions;
 using Krafter.UI.Web.Client.Common.Models;
 using Krafter.UI.Web.Client.Common.Enums;
 using Krafter.UI.Web.Client.Infrastructure.Services;
+using Krafter.UI.Web.Client.Common.Components.DaisyUI;
 
 namespace Krafter.UI.Web.Client.Features.Tenants;
 
 public partial class Tenants(
     CommonService commonService,
-   KrafterClient krafterClient,
-
+    KrafterClient krafterClient,
     DialogService dialogService
     ) : ComponentBase, IDisposable
 {
     public const string RoutePath = KrafterRoute.Tenants;
-    private RadzenDataGrid<TenantDto> grid;
+
     private bool IsLoading = true;
     private GetRequestInput requestInput = new();
+
     [Parameter] public bool? EnableAction { get; set; }
 
     TenantDtoPaginationResponseResponse? response = new()
@@ -37,24 +38,26 @@ public partial class Tenants(
     private async Task Get(bool resetPaginationData = false)
     {
         IsLoading = true;
+
         if (resetPaginationData)
         {
             requestInput.SkipCount = 0;
         }
 
         response = await krafterClient.Tenants.GetPath.GetAsync(
-         configuration =>
-         {
-             configuration.QueryParameters.Id = requestInput.Id;
-             configuration.QueryParameters.History = requestInput.History;
-             configuration.QueryParameters.IsDeleted = requestInput.IsDeleted;
-             configuration.QueryParameters.SkipCount = requestInput.SkipCount;
-             configuration.QueryParameters.MaxResultCount = requestInput.MaxResultCount;
-             configuration.QueryParameters.Filter = requestInput.Filter;
-             configuration.QueryParameters.OrderBy = requestInput.OrderBy;
-             configuration.QueryParameters.Query = requestInput.Query;
-         },CancellationToken.None
-            );
+            configuration =>
+            {
+                configuration.QueryParameters.Id = requestInput.Id;
+                configuration.QueryParameters.History = requestInput.History;
+                configuration.QueryParameters.IsDeleted = requestInput.IsDeleted;
+                configuration.QueryParameters.SkipCount = requestInput.SkipCount;
+                configuration.QueryParameters.MaxResultCount = requestInput.MaxResultCount;
+                configuration.QueryParameters.Filter = requestInput.Filter;
+                configuration.QueryParameters.OrderBy = requestInput.OrderBy;
+                configuration.QueryParameters.Query = requestInput.Query;
+            }, CancellationToken.None
+        );
+
         IsLoading = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -93,13 +96,11 @@ public partial class Tenants(
             {
                 Id = input.Id,
                 DeleteReason = input.DeleteReason,
-                EntityKind =(int) EntityKind.Tenant
+                EntityKind = (int)EntityKind.Tenant
             }, $"Delete Tenant {input.Name}");
-        }
-        else
-        {
-            grid.CancelEditRow(input);
-            await grid.Reload();
+
+            // Refresh data after delete
+            await Get();
         }
     }
 
@@ -107,34 +108,40 @@ public partial class Tenants(
     {
         if (result is not bool) return;
 
-        await grid.Reload();
-    }
-
-    private async Task LoadData(LoadDataArgs args)
-    {
-        IsLoading = true;
-        await Task.Yield();
-        requestInput.SkipCount = args.Skip ?? 0;
-        requestInput.MaxResultCount = args.Top ?? 10;
-        requestInput.Filter = args.Filter;
-        requestInput.OrderBy = args.OrderBy;
+        // Refresh data after dialog closes
         await Get();
     }
 
-    private async Task ActionClicked(RadzenSplitButtonItem? item, TenantDto data)
+    private async Task LoadData(DataGridLoadArgs args)
     {
-        if (item is { Value: KrafterAction.Update })
+        IsLoading = true;
+        await Task.Yield();
+
+        requestInput.SkipCount = args.Skip;
+        requestInput.MaxResultCount = args.Take;
+
+        // Handle sorting
+        if (!string.IsNullOrEmpty(args.SortBy))
         {
-            await Update(data);
+            var direction = args.SortDirection == SortDirection.Ascending ? "asc" : "desc";
+            requestInput.OrderBy = $"{args.SortBy} {direction}";
         }
-        else if (item is { Value: KrafterAction.Create })
+        else
         {
-            await Add();
+            requestInput.OrderBy = null;
         }
-        else if (item is { Value: KrafterAction.Delete })
+
+        // Handle filters - combine all filters into a single filter string
+        if (args.Filters.Any())
         {
-            await Delete(data);
+            requestInput.Filter = string.Join(" and ", args.Filters.Select(f => $"{f.Key} contains '{f.Value}'"));
         }
+        else
+        {
+            requestInput.Filter = null;
+        }
+
+        await Get();
     }
 
     public void Dispose()

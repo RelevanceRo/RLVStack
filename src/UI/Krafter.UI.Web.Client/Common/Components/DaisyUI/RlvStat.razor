@@ -1,0 +1,55 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="stat @CssClass" @attributes="AdditionalAttributes">
+    @if (FigureContent != null)
+    {
+        <div class="stat-figure">
+            @FigureContent
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Title) || TitleContent != null)
+    {
+        <div class="stat-title">
+            @if (TitleContent != null)
+            {
+                @TitleContent
+            }
+            else
+            {
+                @Title
+            }
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Value) || ValueContent != null)
+    {
+        <div class="stat-value">
+            @if (ValueContent != null)
+            {
+                @ValueContent
+            }
+            else
+            {
+                @Value
+            }
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Description) || DescriptionContent != null)
+    {
+        <div class="stat-desc">
+            @if (DescriptionContent != null)
+            {
+                @DescriptionContent
+            }
+            else
+            {
+                @Description
+            }
+        </div>
+    }
+    @if (ActionsContent != null)
+    {
+        <div class="stat-actions">
+            @ActionsContent
+        </div>
+    }
+</div>

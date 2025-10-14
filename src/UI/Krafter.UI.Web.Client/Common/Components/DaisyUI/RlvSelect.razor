@@ -1,0 +1,10 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@typeparam TValue
+@inherits InputBase<TValue>
+
+<select class="select @CssClass"
+        value="@CurrentValueAsString"
+        @attributes="AdditionalAttributes"
+        @onchange="HandleChange">
+    @ChildContent
+</select>

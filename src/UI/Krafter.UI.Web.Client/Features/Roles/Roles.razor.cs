@@ -1,10 +1,11 @@
-﻿using Krafter.Api.Client;
+using Krafter.Api.Client;
 using Krafter.Api.Client.Models;
 using Krafter.UI.Web.Client.Common.Constants;
 using Krafter.UI.Web.Client.Common.Permissions;
 using Krafter.UI.Web.Client.Common.Models;
 using Krafter.UI.Web.Client.Common.Enums;
 using Krafter.UI.Web.Client.Common.Extensions;
+using Krafter.UI.Web.Client.Common.Components.DaisyUI;
 using Krafter.UI.Web.Client.Infrastructure.Services;
 
 namespace Krafter.UI.Web.Client.Features.Roles;
@@ -12,7 +13,6 @@ namespace Krafter.UI.Web.Client.Features.Roles;
 public partial class Roles(CommonService commonService, NavigationManager navigationManager, KrafterClient krafterClient, LayoutService layoutService, DialogService dialogService, NotificationService notificationService) : ComponentBase, IDisposable
 {
     public const string RoutePath = KrafterRoute.Roles;
-    private RadzenDataGrid<RoleDto> grid;
     private bool IsLoading = true;
 
     private GetRequestInput RequestInput = new GetRequestInput();
@@ -55,7 +55,7 @@ public partial class Roles(CommonService commonService, NavigationManager naviga
             }, CancellationToken.None
 
         );
-      
+
         IsLoading = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -73,10 +73,10 @@ public partial class Roles(CommonService commonService, NavigationManager naviga
             });
     }
 
-    private async Task UpdateRole(RoleDto user)
+    private async Task UpdateRole(RoleDto role)
     {
-        await dialogService.OpenAsync<CreateOrUpdateRole>($"Update Role {user.Name}",
-            new Dictionary<string, object>() { { "UserDetails", user } },
+        await dialogService.OpenAsync<CreateOrUpdateRole>($"Update Role {role.Name}",
+            new Dictionary<string, object>() { { "UserDetails", role } },
             new DialogOptions()
             {
                 Width = "50vw",
@@ -88,7 +88,7 @@ public partial class Roles(CommonService commonService, NavigationManager naviga
 
     private async Task DeleteRole(RoleDto roleDto)
     {
-        if (response.Data.Items.Contains(roleDto))
+        if (response?.Data?.Items?.Contains(roleDto) == true)
         {
             await commonService.Delete(new DeleteRequestInput()
             {
@@ -97,45 +97,59 @@ public partial class Roles(CommonService commonService, NavigationManager naviga
                 EntityKind = (int)EntityKind.KrafterRole
             }, $"Delete Role {roleDto.Name}");
         }
-        else
-        {
-            grid.CancelEditRow(roleDto);
-            await grid.Reload();
-        }
     }
 
     private async void Close(object? result)
     {
         if (result is not bool) return;
 
-        await grid.Reload();
+        await GetListAsync();
+        StateHasChanged();
     }
 
-    private async Task LoadData(LoadDataArgs args)
+    // RlvDataGrid event handlers
+    private async Task OnPageChanged(int newPage)
     {
-        IsLoading = true;
-        await Task.Yield();
-        RequestInput.SkipCount = args.Skip ?? 0;
-        RequestInput.MaxResultCount = args.Top ?? 10;
-        RequestInput.Filter = args.Filter;
-        RequestInput.OrderBy = args.OrderBy;
+        RequestInput.SkipCount = (newPage - 1) * RequestInput.MaxResultCount;
         await GetListAsync();
     }
 
-    private async Task ActionClicked(RadzenSplitButtonItem? item, RoleDto data)
+    private async Task OnPageSizeChanged(int newPageSize)
     {
-        if (item is { Value: KrafterAction.Update })
+        RequestInput.MaxResultCount = newPageSize;
+        RequestInput.SkipCount = 0; // Reset to first page
+        await GetListAsync();
+    }
+
+    private async Task OnSortChanged(string propertyName, SortDirection direction)
+    {
+        if (direction == SortDirection.None)
         {
-            await UpdateRole(data);
+            RequestInput.OrderBy = null;
         }
-        else if (item is { Value: KrafterAction.Create })
+        else
         {
-            await AddRole();
+            var sortOrder = direction == SortDirection.Ascending ? "asc" : "desc";
+            RequestInput.OrderBy = $"{propertyName} {sortOrder}";
         }
-        else if (item is { Value: KrafterAction.Delete })
+        await GetListAsync();
+    }
+
+    private async Task OnFilterChanged(Dictionary<string, string> filters)
+    {
+        // Build OData filter string
+        var filterParts = new List<string>();
+        foreach (var filter in filters)
         {
-            await DeleteRole(data);
+            if (!string.IsNullOrWhiteSpace(filter.Value))
+            {
+                filterParts.Add($"contains(tolower({filter.Key}), tolower('{filter.Value}'))");
+            }
         }
+
+        RequestInput.Filter = filterParts.Count > 0 ? string.Join(" and ", filterParts) : null;
+        RequestInput.SkipCount = 0; // Reset to first page when filtering
+        await GetListAsync();
     }
 
     public void Dispose()

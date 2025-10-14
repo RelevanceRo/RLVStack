@@ -1,0 +1,11 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<double>
+
+<input type="range"
+       min="@Min"
+       max="@Max"
+       step="@Step"
+       value="@CurrentValue"
+       class="range @CssClass"
+       @attributes="AdditionalAttributes"
+       @oninput="HandleInput" />

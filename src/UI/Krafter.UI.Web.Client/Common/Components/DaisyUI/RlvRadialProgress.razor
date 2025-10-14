@@ -1,0 +1,16 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="@CssClass"
+     style="@StyleAttribute"
+     aria-valuenow="@Value"
+     role="progressbar"
+     @attributes="AdditionalAttributes">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @($"{Value}%")
+    }
+</div>

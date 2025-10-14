@@ -4,6 +4,7 @@ using Krafter.UI.Web.Client.Common.Constants;
 using Krafter.UI.Web.Client.Common.Permissions;
 using Krafter.UI.Web.Client.Common.Models;
 using Krafter.UI.Web.Client.Common.Enums;
+using Krafter.UI.Web.Client.Common.Components.DaisyUI;
 using Krafter.UI.Web.Client.Infrastructure.Services;
 using Microsoft.Kiota.Abstractions;
 using GetRequestBuilder = Krafter.Api.Client.Users.Get.GetRequestBuilder;
@@ -21,16 +22,16 @@ public partial class Users(
     ) : ComponentBase, IDisposable
 {
     public const string RoutePath = KrafterRoute.Users;
-    private RadzenDataGrid<UserDto> grid;
+    private RlvDataGrid<UserDto> grid;
     private GetRequestInput requestInput = new();
 
     private UserDtoPaginationResponseResponse?  response = new UserDtoPaginationResponseResponse
     {
-             
+
         Data = new UserDtoPaginationResponse()
 
     };
-    
+
     private bool IsLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -41,14 +42,36 @@ public partial class Users(
         await GetListAsync();
     }
 
-    private async Task LoadData(LoadDataArgs args)
+    private async Task LoadData(DataGridLoadArgs args)
     {
         IsLoading = true;
         await Task.Yield();
-        requestInput.SkipCount = args.Skip ?? 0;
-        requestInput.MaxResultCount = args.Top ?? 10;
-        requestInput.Filter = args.Filter;
-        requestInput.OrderBy = args.OrderBy;
+        requestInput.SkipCount = args.Skip;
+        requestInput.MaxResultCount = args.Take;
+
+        // Build OData filter from dictionary of filters
+        if (args.Filters != null && args.Filters.Any())
+        {
+            var filterParts = args.Filters.Select(f => $"{f.Key} eq '{f.Value}'");
+            requestInput.Filter = string.Join(" and ", filterParts);
+        }
+        else
+        {
+            requestInput.Filter = null;
+        }
+
+        // Build OData OrderBy from sort parameters
+        if (!string.IsNullOrEmpty(args.SortBy))
+        {
+            requestInput.OrderBy = args.SortDirection == SortDirection.Ascending
+                ? args.SortBy
+                : $"{args.SortBy} desc";
+        }
+        else
+        {
+            requestInput.OrderBy = null;
+        }
+
         await GetListAsync();
     }
 
@@ -109,9 +132,6 @@ public partial class Users(
 
     private async Task DeleteUser(UserDto user)
     {
-
-
-
         if (response?.Data is not null && response.Data.Items is not null && response.Data.Items.Contains(user))
         {
             await commonService.Delete(new DeleteRequestInput()
@@ -123,8 +143,7 @@ public partial class Users(
         }
         else
         {
-            grid.CancelEditRow(user);
-            await grid.Reload();
+            await grid.RefreshAsync();
         }
     }
 
@@ -133,22 +152,6 @@ public partial class Users(
         if (result == null || !result.Equals(true)) return;
 
         await GetListAsync();
-    }
-
-    private async Task ActionClicked(RadzenSplitButtonItem? item, UserDto data)
-    {
-        if (item is { Value: KrafterAction.Update })
-        {
-            await UpdateUser(data);
-        }
-        else if (item is { Value: KrafterAction.Create })
-        {
-            await AddUser();
-        }
-        else if (item is { Value: KrafterAction.Delete })
-        {
-            await DeleteUser(data);
-        }
     }
 
     public void Dispose()

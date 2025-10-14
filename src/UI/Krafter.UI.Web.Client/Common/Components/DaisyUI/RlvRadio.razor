@@ -1,0 +1,29 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<string>
+
+@if (!string.IsNullOrEmpty(Label))
+{
+    <label class="cursor-pointer @LabelClass">
+        <input type="radio"
+               name="@Name"
+               value="@RadioValue"
+               checked="@IsChecked"
+               class="@CssClass"
+               @attributes="AdditionalAttributes"
+               @onchange="HandleChange" />
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <span class="@LabelTextClass">@Label</span>
+        }
+    </label>
+}
+else
+{
+    <input type="radio"
+           name="@Name"
+           value="@RadioValue"
+           checked="@IsChecked"
+           class="radio @CssClass"
+           @attributes="AdditionalAttributes"
+           @onchange="HandleChange" />
+}

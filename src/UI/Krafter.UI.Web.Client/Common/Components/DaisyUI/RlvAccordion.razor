@@ -1,0 +1,18 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (UseJoin)
+{
+    <div class="join join-vertical @GroupClass" @attributes="AdditionalAttributes">
+        <CascadingValue Value="this">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+else
+{
+    <div class="@GroupClass" @attributes="AdditionalAttributes">
+        <CascadingValue Value="this">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}

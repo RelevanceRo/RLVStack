@@ -1,200 +1,190 @@
-﻿@using Krafter.UI.Web.Client.Infrastructure.Services
+﻿@using Krafter.UI.Web.Client.Common.Components.DaisyUI
+@using Krafter.UI.Web.Client.Infrastructure.Services
 @inherits LayoutComponentBase
-<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
-    <RadzenHeader>
-        <RadzenRow>
-            <RadzenColumn>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0" JustifyContent="JustifyContent.Left">
-                    <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-                    @if (IsMobileDevice == false)
-                    {
-                        <Logo Orientation="LogoOrientation.Horizontal" Size="LogoSize.ExtraSmall" />
-                    }
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Style="margin-top:10px">
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="0" JustifyContent="JustifyContent.Center">
-                    <RadzenLabel>
-                        <strong> @LocalAppSate.CurrentPageTitle</strong>
-                    </RadzenLabel>
-                    @if (IsMobileDevice == true)
-                    {
-                        <Logo Orientation="LogoOrientation.Horizontal" Size="LogoSize.ExtraSmall" />
-                      
-                    }
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Style="margin-top:10px">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0" JustifyContent="JustifyContent.Right">
-                    @if (IsMobileDevice == false)
-                    {
-                        <TopRight></TopRight>
-                    }
-                    <Notifications></Notifications>
-                    <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-    </RadzenHeader>
 
-    <RadzenBody @ref="@body0">
-        <ChildContent>
+<div class="drawer lg:drawer-open">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle" @bind="sidebarExpanded" />
+
+    <div class="drawer-content flex flex-col">
+        <!-- Header / Navbar -->
+        <header class="w-full navbar bg-base-100 shadow-lg">
+            <div class="flex-none lg:hidden">
+                <label for="main-drawer" class="btn btn-square btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </label>
+            </div>
+
+            <div class="flex-none hidden lg:flex">
+                <Logo Orientation="LogoOrientation.Horizontal" Size="LogoSize.ExtraSmall" />
+            </div>
+
+            <div class="flex-1 flex flex-col items-center justify-center">
+                @if (IsMobileDevice == true)
+                {
+                    <Logo Orientation="LogoOrientation.Horizontal" Size="LogoSize.ExtraSmall" />
+                }
+                <span class="font-bold text-lg">@LocalAppSate.CurrentPageTitle</span>
+            </div>
+
+            <div class="flex-none flex items-center gap-2">
+                @if (IsMobileDevice == false)
+                {
+                    <TopRight></TopRight>
+                }
+                <Notifications></Notifications>
+                <label for="config-drawer" class="btn btn-square btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </label>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4">
             <PageTitle>@LocalAppSate.CurrentPageTitle</PageTitle>
             @Body
-        </ChildContent>
-    </RadzenBody>
-    <RadzenSidebar @ref="sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
-        <AuthorizeView>
-            <Authorized>
-                <div style="padding: 1rem">
-                    <RadzenTextBox id="find" Placeholder="Find items ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" aria-label="find" />
-                </div>
-                <div style="flex: 1; overflow: auto">
-                    <RadzenPanelMenu>
-                        @foreach (var category in menus)
-                        {
-                            if (category.Children != null && category.Children.Count() > 0 && (HasChildPermission(category)))
+        </main>
+    </div>
+
+    <!-- Left Sidebar (Navigation) -->
+    <div class="drawer-side z-40">
+        <label for="main-drawer" class="drawer-overlay"></label>
+        <aside class="bg-base-200 w-80 min-h-full">
+            <AuthorizeView>
+                <Authorized>
+                    <div class="p-4">
+                        <input type="search"
+                               class="input input-bordered w-full"
+                               placeholder="Find items..."
+                               value="@searchTerm"
+                               @oninput="@FilterPanelMenu" />
+                    </div>
+                    <div class="overflow-y-auto flex-1">
+                        <RlvMenu Class="w-full">
+                            @foreach (var category in menus)
                             {
-                                <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
-
-
-                                    @if (category.Children != null && category.Children.Count() > 0)
-                                    {
-                                        @foreach (var menu in category.Children)
+                                if (category.Children != null && category.Children.Count() > 0 && (HasChildPermission(category)))
+                                {
+                                    <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
+                                        @if (category.Children != null && category.Children.Count() > 0)
                                         {
-                                            if (menu.Children != null && menu.Children.Count() > 0 && HasChildPermission(menu))
+                                            @foreach (var menu in category.Children)
                                             {
-                                                <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu>
-                                                    @foreach (var child in menu.Children)
-                                                    {
-                                                        if (HasPermission(menu))
+                                                if (menu.Children != null && menu.Children.Count() > 0 && HasChildPermission(menu))
+                                                {
+                                                    <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu>
+                                                        @foreach (var child in menu.Children)
                                                         {
-                                                            <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
+                                                            if (HasPermission(menu))
+                                                            {
+                                                                <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
+                                                            }
                                                         }
-                                                    }
-                                                </NavigationItem>
-                                            }
-                                            else if (HasPermission(menu))
-                                            {
-                                                <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu />
+                                                    </NavigationItem>
+                                                }
+                                                else if (HasPermission(menu))
+                                                {
+                                                    <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu />
+                                                }
                                             }
                                         }
-                                    }
-
-                                </NavigationItem>
+                                    </NavigationItem>
+                                }
+                                else if (HasPermission(category))
+                                {
+                                    <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category></NavigationItem>
+                                }
                             }
-                            else if (HasPermission(category))
-                            {
-                                <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
+                        </RlvMenu>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        </aside>
+    </div>
+</div>
 
-                                </NavigationItem>
-                            }
-                        }
-                    </RadzenPanelMenu>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-    </RadzenSidebar>
-    <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
-        <RadzenStack class="rz-p-4" Gap="0">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0">Demos Configuration</RadzenText>
-                <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => configSidebarExpanded = false)" />
-            </RadzenStack>
+<!-- Right Sidebar (Configuration) -->
+<div class="drawer drawer-end @(configSidebarExpanded ? "drawer-open" : "")" style="position: fixed; top: 0; right: 0; height: 100vh; width: 100%; pointer-events: @(configSidebarExpanded ? "auto" : "none"); z-index: 50;">
+    <input id="config-drawer" type="checkbox" class="drawer-toggle" @bind="configSidebarExpanded" />
+    <div class="drawer-side" style="pointer-events: auto;">
+        <label for="config-drawer" class="drawer-overlay" @onclick="HandleCloseConfig"></label>
+        <aside class="bg-base-200 w-96 min-h-full p-4">
+            <div class="flex flex-row items-center justify-between mb-6">
+                <h2 class="text-xl font-bold m-0">Demos Configuration</h2>
+                <RlvButton Style="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonStyle.Ghost"
+                           Size="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonSize.Small"
+                           OnClick="HandleCloseConfig">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </RlvButton>
+            </div>
 
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-mt-6">
+            <div class="flex flex-row items-center justify-between gap-2 mt-6">
                 <TopRight ShowProfileCard="true"></TopRight>
-            </RadzenStack> 
-            
-           
+            </div>
 
+            <div class="flex flex-row items-center justify-between gap-2 mt-6">
+                <div class="flex flex-row items-center gap-1">
+                    <RlvLabel Text="Use WCAG compliant colors" For="WCAG" />
+                    <RlvButton Style="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonStyle.Ghost"
+                               Size="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonSize.XSmall"
+                               OnClick="HandleShowWcagTooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </RlvButton>
+                </div>
+                <RlvToggle @bind-Value="wcagEnabled" Color="ToggleColor.Primary" />
+            </div>
 
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-mt-6">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-                    <RadzenLabel Text="Use WCAG compliant colors" Component="WCAG" Title="Use WCAG 2.2 AA compliant color swatches" />
-                    <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" @ref="wcagColorsInfo" Click="@(args => WcagColorsTooltip(wcagColorsInfo.Element, new TooltipOptions() { Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
-                </RadzenStack>
-                <RadzenSwitch Value="@(themeService.Wcag == true)" Name="WCAG" Change="@(themeService.SetWcag)" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-mt-5">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-                    <RadzenLabel Text="Enable RTL directionality" Component="RTL" Title="Use right to left direction for languages that are written from the right to the left (like Arabic)" />
-                    <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" @ref="rtlInfo" Click="@(args => RtlTooltip(rtlInfo.Element, new TooltipOptions() { Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
-                </RadzenStack>
-                <RadzenSwitch Value="@(themeService.RightToLeft == true)" Name="RTL" Change="@(themeService.SetRightToLeft)" />
-            </RadzenStack>
+            <div class="flex flex-row items-center justify-between gap-2 mt-5">
+                <div class="flex flex-row items-center gap-1">
+                    <RlvLabel Text="Enable RTL directionality" For="RTL" />
+                    <RlvButton Style="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonStyle.Ghost"
+                               Size="Krafter.UI.Web.Client.Common.Components.DaisyUI.ButtonSize.XSmall"
+                               OnClick="HandleShowRtlTooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </RlvButton>
+                </div>
+                <RlvToggle @bind-Value="rtlEnabled" Color="ToggleColor.Primary" />
+            </div>
 
+            <div class="flex flex-row items-center justify-between gap-2 mt-6">
+                <p class="text-base font-semibold m-0">Theme Preference</p>
+            </div>
 
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-mt-6">
-                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Theme Preference</RadzenText>
-            </RadzenStack>
-
-            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.5rem" class="rz-mt-2">
-                <RadzenRadioButtonList @bind-Value="themePreference" TValue="ThemeManager.ThemePreference">
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Auto (System)" Value="ThemeManager.ThemePreference.Auto" />
-                        <RadzenRadioButtonListItem Text="Light" Value="ThemeManager.ThemePreference.Light" />
-                        <RadzenRadioButtonListItem Text="Dark" Value="ThemeManager.ThemePreference.Dark" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </RadzenStack>
-
-               
-
-        
-            
-
-        </RadzenStack>
-    </RadzenSidebar>
-
-    @*  <RadzenFooter>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="0px" AlignItems="AlignItems.Center">
-            <RadzenLabel Text="@(AppInfo?.Data??"--")" />
-            <RadzenLabel Text="@($"Aditi Kraft© {DateTime.Now.Year}")"></RadzenLabel>
-            <RadzenLabel Text="@($"UI version {BuildInfo.Build}, built on {BuildInfo.DateTimeUtc}, running on {RuntimeInformation.FrameworkDescription}")"></RadzenLabel>
-        </RadzenStack>
-    </RadzenFooter> *@
-
-</RadzenLayout>
-
-
+            <div class="flex flex-col items-start gap-2 mt-2">
+                @foreach (var pref in new[] {
+                    (ThemeManager.ThemePreference.Auto, "Auto (System)"),
+                    (ThemeManager.ThemePreference.Light, "Light"),
+                    (ThemeManager.ThemePreference.Dark, "Dark")
+                })
+                {
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <RlvRadio Name="themePreference"
+                                  RadioValue="@pref.Item1.ToString()"
+                                  @bind-Value="themePreferenceStr"
+                                  Color="RadioColor.Primary" />
+                        <span>@pref.Item2</span>
+                    </label>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
 
 @if (!rendered)
 {
     <div class="rz-app-loading">
         <div class="logo-loading"></div>
     </div>
-}
-
-@code {
-
-
-
-
-
-    void WcagColorsTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
-@<div Style="width: 280px; white-space: normal; padding: 20px;">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor;">WCAG Compliant Colors</RadzenText>
-        <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">Enable to preview themes with WCAG 2.2 AA compliant color swatches.</RadzenText>
-    </div>, options);
-
-    void RtlTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
-@<div Style="width: 280px; white-space: normal; padding: 20px;">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor;">RTL directionality</RadzenText>
-        <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">Use right to left direction for languages that are written from the right to the left (like Arabic).</RadzenText>
-    </div>, options);
-
-
-    private ThemeManager.ThemePreference themePreference
-    {
-        get => themeManager.CurrentPreference;
-        set
-        {
-            themeManager.SetThemePreference(value).ConfigureAwait(false);
-        }
-    }
-
-
 }
 
 <div id="blazor-error-ui">

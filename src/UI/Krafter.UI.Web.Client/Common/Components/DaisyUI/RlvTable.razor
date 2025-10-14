@@ -1,0 +1,16 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (OverflowWrapper)
+{
+    <div class="@WrapperCssClass">
+        <table class="@TableCssClass" @attributes="AdditionalAttributes">
+            @ChildContent
+        </table>
+    </div>
+}
+else
+{
+    <table class="@TableCssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </table>
+}

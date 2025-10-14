@@ -1,19 +1,44 @@
-﻿@using Radzen.Blazor.Rendering;
-<RadzenButton  ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Variant="Variant.Outlined" @ref=button Icon="notifications" Click="@(args => popup.ToggleAsync(button.Element))" />
+﻿@using Krafter.UI.Web.Client.Common.Components.DaisyUI
+<RlvIndicator>
+    <RlvBadge Color="BadgeColor.Secondary" Size="BadgeSize.Small" Text="@GetNotificationCount()" Indicator="true" />
+    <RlvDropdown HorizontalPlacement="DropdownHorizontalPlacement.End">
+        <ButtonContent>
+            <button class="btn btn-ghost btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            </button>
+        </ButtonContent>
+        <Content>
+            <div class="bg-base-100 rounded-box w-96 max-h-96 overflow-y-auto shadow-lg">
+                <div class="p-4 border-b border-base-300">
+                    <h3 class="font-bold text-lg">Notifications</h3>
+                </div>
 
-    <Popup @ref=popup Lazy=true Open="@OnOpen"
-       Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
-    <ChildContent>  
-        
-        
-        
-        <h1> notification will go here</h1>
-
-        @foreach (var message in messages)
-        {
-            <li>@message</li>
-        }
-    
-    </ChildContent>
-  
-</Popup>
+                @if (messages.Count == 0)
+                {
+                    <div class="p-8 text-center text-base-content opacity-60">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        </svg>
+                        <p>No notifications yet</p>
+                    </div>
+                }
+                else
+                {
+                    <ul class="menu p-2">
+                        @foreach (var message in messages)
+                        {
+                            <li class="border-b border-base-300 last:border-0">
+                                <div class="flex flex-col items-start py-2">
+                                    <span class="text-sm">@message</span>
+                                    <span class="text-xs opacity-60">Just now</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </Content>
+    </RlvDropdown>
+</RlvIndicator>

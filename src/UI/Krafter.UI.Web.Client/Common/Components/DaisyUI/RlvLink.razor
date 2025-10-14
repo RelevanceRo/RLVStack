@@ -1,0 +1,28 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (!string.IsNullOrEmpty(Href))
+{
+    <a href="@Href" class="link @CssClass" @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+        else
+        {
+            @ChildContent
+        }
+    </a>
+}
+else
+{
+    <button type="button" class="link @CssClass" @onclick="OnClick" @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+        else
+        {
+            @ChildContent
+        }
+    </button>
+}

@@ -16,7 +16,7 @@ using Radzen;
 FluentValidationConfig.IsRunningOnUI = true;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
-builder.Services.AddRadzenComponents();
+builder.Services.AddScoped<DialogService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IKrafterLocalStorageService, KrafterLocalStorageService>();
 builder.Services.AddScoped<IApiService, ClientSideApiService>();

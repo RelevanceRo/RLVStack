@@ -30,4 +30,18 @@ public partial class NavigationItem(NavigationManager navigationManager)
         //  return Example.Path == null ? Example.Path : $"{Example.Path}{new Uri(navigationManager.Uri).Query}";
         return  Example.Path;
      }
-} 
+
+     string GetItemClass()
+     {
+          // Check if current URL matches this menu item's path
+          if (!string.IsNullOrEmpty(Example.Path))
+          {
+               var currentPath = new Uri(navigationManager.Uri).LocalPath;
+               if (currentPath.Equals(Example.Path, StringComparison.OrdinalIgnoreCase))
+               {
+                    return "menu-active bg-base-200";
+               }
+          }
+          return string.Empty;
+     }
+}

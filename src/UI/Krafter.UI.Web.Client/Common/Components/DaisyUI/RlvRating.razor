@@ -1,0 +1,58 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<int>
+
+<div class="rating @ContainerCssClass" @attributes="AdditionalAttributes">
+    @if (AllowClear)
+    {
+        <input type="radio"
+               name="@Name"
+               value="0"
+               checked="@(CurrentValue == 0)"
+               class="rating-hidden"
+               aria-label="clear"
+               @onchange="@(() => HandleChange(0))"
+               disabled="@IsReadOnly" />
+    }
+
+    @if (Half)
+    {
+        @for (int i = 1; i <= Count; i++)
+        {
+            int halfValue = (i * 2) - 1; // 1, 3, 5, 7, 9 for 0.5, 1.5, 2.5, 3.5, 4.5
+            int fullValue = i * 2; // 2, 4, 6, 8, 10 for 1, 2, 3, 4, 5
+
+            <input type="radio"
+                   name="@Name"
+                   value="@halfValue"
+                   checked="@(CurrentValue == halfValue)"
+                   class="@ItemCssClass mask-half-1"
+                   aria-label="@(halfValue / 2.0) star"
+                   @onchange="@(() => HandleChange(halfValue))"
+                   disabled="@IsReadOnly" />
+
+            <input type="radio"
+                   name="@Name"
+                   value="@fullValue"
+                   checked="@(CurrentValue == fullValue)"
+                   class="@ItemCssClass mask-half-2"
+                   aria-label="@(fullValue / 2.0) star"
+                   @onchange="@(() => HandleChange(fullValue))"
+                   disabled="@IsReadOnly" />
+        }
+    }
+    else
+    {
+        @for (int i = 1; i <= Count; i++)
+        {
+            int starValue = i;
+            <input type="radio"
+                   name="@Name"
+                   value="@starValue"
+                   checked="@(CurrentValue == starValue)"
+                   class="@ItemCssClass"
+                   aria-label="@starValue star"
+                   @onchange="@(() => HandleChange(starValue))"
+                   disabled="@IsReadOnly" />
+        }
+    }
+</div>

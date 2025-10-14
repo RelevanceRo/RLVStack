@@ -1,5 +1,6 @@
 ﻿
 using Krafter.UI.Web.Client.Features.Auth._Shared;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Krafter.UI.Web.Client.Common.Components.Layout;
 
@@ -13,27 +14,31 @@ public partial class TopRight(IAuthenticationService authenticationService,
     [Parameter]
     public bool ShowProfileCard { get; set; }
 
-    private async Task SplitButtonClick(RadzenSplitButtonItem? item)
+    private async Task OnMenuItemClick(string action)
     {
-        if (item is { Value: "Logout" })
+        if (action == "Logout")
         {
-            await authenticationService.LogoutAsync("SplitButtonClick 20");
+            await authenticationService.LogoutAsync("OnMenuItemClick Logout");
             NavigateToLogin();
         }
-        else if (item is { Value: "ChangePassword" })
+        else if (action == "ChangePassword")
         {
             navigationManager.NavigateTo(
                 $"/account/change-password?ReturnUrl={navigationManager.ToBaseRelativePath(navigationManager.Uri)}");
         }
-        else if (item is { Value: "Appearance" })
+        else if (action == "Appearance")
         {
-            navigationManager.NavigateTo(
-                $"/appearance");
+            navigationManager.NavigateTo("/appearance");
         }
     }
 
     private void NavigateToLogin()
     {
         navigationManager.NavigateTo("/login");
+    }
+
+    private void HandleNavigateToLogin(MouseEventArgs e)
+    {
+        NavigateToLogin();
     }
 }

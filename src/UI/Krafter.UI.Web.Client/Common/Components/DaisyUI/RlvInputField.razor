@@ -1,0 +1,10 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inherits InputBase<string>
+
+<input type="@Type"
+       class="@CssClass"
+       placeholder="@Placeholder"
+       value="@CurrentValue"
+       @oninput="HandleInput"
+       disabled="@(AdditionalAttributes?.ContainsKey("disabled") == true)"
+       @attributes="AdditionalAttributes" />

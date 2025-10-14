@@ -5,6 +5,7 @@ using Krafter.UI.Web.Client.Models;
 using Krafter.UI.Web.Client.Infrastructure.Services;
 using Krafter.UI.Web.Client.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Krafter.UI.Web.Client.Common.Components.Layout;
 
@@ -25,20 +26,27 @@ public partial class MainLayout(KrafterClient krafterClient,
     [CascadingParameter]
     private HttpContext HttpContext { get; set; }
 
-    private RadzenSidebar sidebar0;
-    private RadzenBody body0;
-    private RadzenButton wcagColorsInfo;
-    private RadzenButton rtlInfo;
-    private RadzenButton freeThemesInfo;
-    private RadzenButton premiumThemesInfo;
     private bool sidebarExpanded = true;
     private bool configSidebarExpanded = false;
     private bool rendered;
+    private string searchTerm = string.Empty;
 
     private IEnumerable<Menu> menus = new List<Menu>();
 
     private ICollection<string>? cachedPermissionsAsync = new List<string>();
     public StringResponse? AppInfo { get; set; }
+
+    private bool wcagEnabled
+    {
+        get => themeService.Wcag == true;
+        set => themeService.SetWcag(value);
+    }
+
+    private bool rtlEnabled
+    {
+        get => themeService.RightToLeft == true;
+        set => themeService.SetRightToLeft(value);
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -104,5 +112,43 @@ public partial class MainLayout(KrafterClient krafterClient,
             return true;
         }
         return cachedPermissionsAsync.Contains(category.Permission);
+    }
+
+    private void HandleCloseConfig(MouseEventArgs e)
+    {
+        configSidebarExpanded = false;
+    }
+
+    private void HandleShowWcagTooltip(MouseEventArgs e)
+    {
+        // TODO: Implement tooltip using RlvTooltip or RlvModal if needed
+        // For now, the label provides enough context
+    }
+
+    private void HandleShowRtlTooltip(MouseEventArgs e)
+    {
+        // TODO: Implement tooltip using RlvTooltip or RlvModal if needed
+        // For now, the label provides enough context
+    }
+
+    private string themePreferenceStr
+    {
+        get => themeManager.CurrentPreference.ToString();
+        set
+        {
+            if (Enum.TryParse<ThemeManager.ThemePreference>(value, out var pref))
+            {
+                themeManager.SetThemePreference(pref).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private ThemeManager.ThemePreference themePreference
+    {
+        get => themeManager.CurrentPreference;
+        set
+        {
+            themeManager.SetThemePreference(value).ConfigureAwait(false);
+        }
     }
 }

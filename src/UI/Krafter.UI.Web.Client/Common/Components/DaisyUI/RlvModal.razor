@@ -1,0 +1,50 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+@inject IJSRuntime JSRuntime
+
+<dialog id="@Id" class="modal @CssClass" @attributes="AdditionalAttributes">
+    @if (ShowModalBox)
+    {
+        <div class="modal-box @ModalBoxClass">
+            @if (ShowCloseButton)
+            {
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+            }
+            @if (Title != null)
+            {
+                <h3 class="font-bold text-lg">@Title</h3>
+            }
+            @if (TitleContent != null)
+            {
+                @TitleContent
+            }
+            @if (Content != null)
+            {
+                <div class="py-4">
+                    @Content
+                </div>
+            }
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+            @if (Actions != null)
+            {
+                <div class="modal-action">
+                    @Actions
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        @ChildContent
+    }
+    @if (CloseOnBackdropClick)
+    {
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    }
+</dialog>

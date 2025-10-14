@@ -1,0 +1,25 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="collapse @CssClass" @attributes="AdditionalAttributes">
+    <input type="radio" name="@Name" value="@Value" checked="@IsOpen" />
+    <div class="collapse-title @TitleClass">
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            @Title
+        }
+        else
+        {
+            @TitleContent
+        }
+    </div>
+    <div class="collapse-content @ContentClass">
+        @if (!string.IsNullOrEmpty(Content))
+        {
+            @Content
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+</div>

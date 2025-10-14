@@ -1,0 +1,11 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="mockup-browser @CssClass" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Url))
+    {
+        <div class="mockup-browser-toolbar">
+            <div class="input">@Url</div>
+        </div>
+    }
+    @ChildContent
+</div>

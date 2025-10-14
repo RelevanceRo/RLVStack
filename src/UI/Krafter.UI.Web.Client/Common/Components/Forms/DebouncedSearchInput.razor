@@ -1,18 +1,32 @@
-﻿<RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-    <RadzenStack Style="width: 10%;" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Right">
+﻿@using Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="flex flex-row gap-4 items-center">
+    <div class="w-[10%] flex justify-end items-center">
         @if (IsLoading)
         {
-            <LoadingIndicator Size="LoadingIndicatorSize.ExtraSmall"/>
+            <LoadingIndicator Size="LoadingIndicatorSize.ExtraSmall" />
         }
-       
-    </RadzenStack>
-    <RadzenStack Style="width: 85%;">
-        <RadzenTextBox @bind-Value="Value" @oninput="OnInputChanged" @onkeydown="OnKeyDown" Placeholder="Enter search text"  />
-        </RadzenStack>
-    <RadzenStack Style="width: 5%;">
+    </div>
+
+    <div class="w-[85%]">
+        <RlvInputField @bind-Value="Value"
+                       @oninput="OnInputChanged"
+                       @onkeydown="OnKeyDown"
+                       Placeholder="Enter search text"
+                       class="w-full" />
+    </div>
+
+    <div class="w-[5%]">
         @if (!IsAutoSearch)
         {
-            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Disabled="IsLoading" Click="TriggerSearch" />
+            <RlvButton Color="ButtonColor.Secondary"
+                       Disabled="@IsLoading"
+                       OnClick="@(async (e) => await TriggerSearch())"
+                       Size="ButtonSize.Small">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </RlvButton>
         }
-    </RadzenStack>
-</RadzenStack>
+    </div>
+</div>

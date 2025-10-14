@@ -1,0 +1,45 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+@if (!string.IsNullOrEmpty(Href))
+{
+    <a href="@Href"
+       class="@CssClass"
+       role="button"
+       tabindex="@(Disabled ? "-1" : null)"
+       aria-disabled="@(Disabled ? "true" : null)"
+       @attributes="AdditionalAttributes">
+        @if (Loading)
+        {
+            <span class="loading loading-spinner"></span>
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+    </a>
+}
+else
+{
+    <button type="@Type"
+            class="@CssClass"
+            disabled="@Disabled"
+            @onclick="HandleClick"
+            @attributes="AdditionalAttributes">
+        @if (Loading)
+        {
+            <span class="loading loading-spinner"></span>
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            @Text
+        }
+    </button>
+}

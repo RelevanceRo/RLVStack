@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Admin/source/repos/RelevanceRo/RLVStack/.github/**)",
+      "Bash(test -f \"C:\\Users\\Admin\\source\\repos\\RelevanceRo\\RLVStack\\src\\UI\\Krafter.UI.Web\\package.json\")",
+      "Bash(npm init -y)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:css:*)",
+      "Read(//c/Users/Admin/source/repos/RelevanceRo/RLVStack/**)",
+      "Bash(test:*)",
+      "Bash(git check-ignore:*)",
+      "WebSearch",
+      "WebFetch(domain:daisyui.com)",
+      "Bash(dotnet build:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(rmdir:*)",
+      "Bash(Select-String -Pattern \"(error|Build succeeded|Build FAILED)\")",
+      "Bash(Select-Object -First 20)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Select-Object -First 100)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet clean:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

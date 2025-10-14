@@ -1,0 +1,32 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="chat @GetPlacementClass()" @attributes="AdditionalAttributes">
+    @if (ImageContent != null)
+    {
+        <div class="chat-image">
+            @ImageContent
+        </div>
+    }
+    @if (HeaderContent != null)
+    {
+        <div class="chat-header">
+            @HeaderContent
+        </div>
+    }
+    <div class="chat-bubble @GetBubbleColorClass()">
+        @if (BubbleContent != null)
+        {
+            @BubbleContent
+        }
+        else if (!string.IsNullOrEmpty(Message))
+        {
+            @Message
+        }
+    </div>
+    @if (FooterContent != null)
+    {
+        <div class="chat-footer">
+            @FooterContent
+        </div>
+    }
+</div>

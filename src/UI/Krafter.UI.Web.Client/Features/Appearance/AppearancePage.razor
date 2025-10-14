@@ -1,21 +1,37 @@
-﻿@page "/appearance"
+@page "/appearance"
 @using Krafter.UI.Web.Client.Features.Appearance
-<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
-    <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
-            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
-                <RadzenLabel Text="Change the current theme" />
-                <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@themeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
-                </RadzenDropDown>
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
-                <RadzenLabel Text="Right-to-left" />
-                <RadzenSwitch Value=@(themeService.RightToLeft == true) ValueChanged=@ChangeRightToLeft />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
-                <RadzenLabel Text="WCAG compliant colors" />
-                <RadzenSwitch Value="@(themeService.Wcag == true)" Name="WCAG" ValueChanged=@ChangeWcag />
-            </RadzenStack>
-        </RadzenStack>
-    </RadzenCard>
-</RadzenStack>
+@using Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="p-0 md:p-6 lg:p-12">
+    <RlvCard class="w-full">
+        <div class="flex flex-row flex-wrap gap-4 p-4">
+            <!-- Theme Selection -->
+            <div class="flex flex-col gap-2">
+                <RlvLabel Text="Change the current theme" />
+                <RlvSelect TValue="string"
+                           @bind-Value="@selectedTheme"
+                           OnChange="@ChangeTheme"
+                           class="w-full min-w-[200px]">
+                    @foreach (var theme in Themes.Free)
+                    {
+                        <option value="@theme.Value">@theme.Text</option>
+                    }
+                </RlvSelect>
+            </div>
+
+            <!-- Right-to-Left Toggle -->
+            <div class="flex flex-col gap-2">
+                <RlvLabel Text="Right-to-left" />
+                <RlvToggle @bind-Value="@rightToLeft"
+                           OnChange="@((bool val) => ChangeRightToLeft(val))" />
+            </div>
+
+            <!-- WCAG Compliant Colors Toggle -->
+            <div class="flex flex-col gap-2">
+                <RlvLabel Text="WCAG compliant colors" />
+                <RlvToggle @bind-Value="@wcag"
+                           OnChange="@((bool val) => ChangeWcag(val))" />
+            </div>
+        </div>
+    </RlvCard>
+</div>

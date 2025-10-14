@@ -101,6 +101,19 @@ namespace Krafter.UI.Web.Client.Common.Components.Brand
             await InvokeAsync(StateHasChanged);
         }
 
+        private string GetSizeClass()
+        {
+            return Size switch
+            {
+                LogoSize.ExtraSmall => "h-8 w-auto object-contain",
+                LogoSize.Small => "h-12 w-auto object-contain",
+                LogoSize.Medium => "h-16 w-auto object-contain",
+                LogoSize.Large => "h-24 w-auto object-contain",
+                LogoSize.ExtraLarge => "h-32 w-auto object-contain",
+                _ => "h-16 w-auto object-contain"
+            };
+        }
+
         public void Dispose()
         {
             themeManager.ThemeChangeRequested -= OnThemeChanged;

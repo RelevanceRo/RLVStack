@@ -1,0 +1,41 @@
+@namespace Krafter.UI.Web.Client.Common.Components.DaisyUI
+
+<div class="card @CssClass" @attributes="AdditionalAttributes">
+    @if (Figure != null)
+    {
+        <figure class="@FigureClass">
+            @Figure
+        </figure>
+    }
+    @if (ShowCardBody)
+    {
+        <div class="card-body @CardBodyClass">
+            @if (Title != null)
+            {
+                <h2 class="card-title">@Title</h2>
+            }
+            @if (TitleContent != null)
+            {
+                <h2 class="card-title">@TitleContent</h2>
+            }
+            @if (Content != null)
+            {
+                @Content
+            }
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+            @if (Actions != null)
+            {
+                <div class="card-actions @ActionsClass">
+                    @Actions
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>

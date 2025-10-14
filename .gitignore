@@ -453,3 +453,9 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+##
+## Project-specific
+##
+# DaisyUI documentation files (LLM context)
+src/UI/Krafter.UI.Web.Client/Docs/
