@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(docker:*)",
+      "Bash(dotnet tool list:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell:*)",
+      "Bash(dotnet ef database update:*)",
+      "Bash(dotnet build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

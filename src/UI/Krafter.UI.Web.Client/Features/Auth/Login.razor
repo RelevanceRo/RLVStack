@@ -40,7 +40,7 @@
 
             <p class="text-center text-base my-4">Or</p>
 
-            <form @onsubmit="@((EventArgs _) => CreateToken(TokenRequestInput))" class="space-y-3">
+            <EditForm Model="@TokenRequestInput" OnValidSubmit="@(() => CreateToken(TokenRequestInput))" class="space-y-3">
                 <FluentValidationValidator Options="@(options => options.IncludeAllRuleSets())"/>
 
                 <div class="grid grid-cols-12 gap-4 items-center">
@@ -93,7 +93,7 @@
                         }
                     </RlvButton>
                 </div>
-            </form>
+            </EditForm>
         </RlvCard>
     </div>
 </div>

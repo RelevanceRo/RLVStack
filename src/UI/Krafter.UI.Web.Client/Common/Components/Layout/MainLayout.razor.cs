@@ -10,12 +10,9 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Krafter.UI.Web.Client.Common.Components.Layout;
 
 public partial class MainLayout(KrafterClient krafterClient,
-    CookieThemeService CookieThemeService,
     MenuService menuService,
     LayoutService layoutService,
     IAuthenticationService authenticationService,
-     ThemeService themeService,
-     TooltipService tooltipService,
     ThemeManager themeManager,
     IKrafterLocalStorageService krafterLocalStorageService
     ) : IDisposable
@@ -35,18 +32,6 @@ public partial class MainLayout(KrafterClient krafterClient,
 
     private ICollection<string>? cachedPermissionsAsync = new List<string>();
     public StringResponse? AppInfo { get; set; }
-
-    private bool wcagEnabled
-    {
-        get => themeService.Wcag == true;
-        set => themeService.SetWcag(value);
-    }
-
-    private bool rtlEnabled
-    {
-        get => themeService.RightToLeft == true;
-        set => themeService.SetRightToLeft(value);
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -83,11 +68,6 @@ public partial class MainLayout(KrafterClient krafterClient,
         menus = string.IsNullOrEmpty(term) ? menuService.Menus : menuService.Filter(term);
     }
 
-    private void ChangeTheme(object value)
-    {
-        themeService.SetTheme($"{value}");
-    }
-
     private void HeadingChanged(object? sender, EventArgs e)
     {
         this.InvokeAsync(StateHasChanged);
@@ -117,18 +97,6 @@ public partial class MainLayout(KrafterClient krafterClient,
     private void HandleCloseConfig(MouseEventArgs e)
     {
         configSidebarExpanded = false;
-    }
-
-    private void HandleShowWcagTooltip(MouseEventArgs e)
-    {
-        // TODO: Implement tooltip using RlvTooltip or RlvModal if needed
-        // For now, the label provides enough context
-    }
-
-    private void HandleShowRtlTooltip(MouseEventArgs e)
-    {
-        // TODO: Implement tooltip using RlvTooltip or RlvModal if needed
-        // For now, the label provides enough context
     }
 
     private string themePreferenceStr

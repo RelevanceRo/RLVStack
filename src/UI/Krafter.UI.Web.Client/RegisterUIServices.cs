@@ -10,12 +10,6 @@ public static class RegisterUIServices
 {
     public static void AddUIServices(this IServiceCollection service, string remoteHostUrl)
     {
-        service.AddRadzenCookieThemeService(options =>
-        {
-            options.Name = "KrafterTheme"; // The name of the cookie
-            options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
-        });
-
         service.AddScoped<ThemeManager>();
         service.AddScoped<SignalRService>();
         service.AddBlazoredSessionStorage();
