@@ -2,7 +2,7 @@
 @using Krafter.UI.Web.Client.Infrastructure.Services
 @inherits LayoutComponentBase
 
-<div class="drawer lg:drawer-open">
+<div class="drawer drawer-open">
     <input id="main-drawer" type="checkbox" class="drawer-toggle" @bind="sidebarExpanded" />
 
     <div class="drawer-content flex flex-col">
@@ -51,55 +51,57 @@
     </div>
 
     <!-- Left Sidebar (Navigation) -->
-    <div class="drawer-side z-40">
-        <label for="main-drawer" class="drawer-overlay"></label>
-        <aside class="bg-base-200 w-80 min-h-full">
+    <div class="drawer-side is-drawer-close:overflow-visible z-40 max-lg:z-50">
+        <label for="main-drawer" class="drawer-overlay max-lg:block lg:hidden"></label>
+        <aside class="is-drawer-close:w-20 is-drawer-open:w-80 bg-base-200 min-h-full flex flex-col">
             <AuthorizeView>
                 <Authorized>
-                    <div class="p-4">
+                    <!-- Logo / Brand -->
+                    <div class="p-4 flex items-center justify-center lg:justify-start border-b border-base-300">
+                        <div class="is-drawer-close:hidden is-drawer-open:block">
+                            <Logo Orientation="LogoOrientation.Horizontal" Size="LogoSize.ExtraSmall" />
+                        </div>
+                        <div class="is-drawer-close:block is-drawer-open:hidden">
+                            <Logo Orientation="LogoOrientation.Vertical" Size="LogoSize.ExtraSmall" />
+                        </div>
+                    </div>
+
+                    <!-- Search (hidden when drawer closed) -->
+                    <div class="p-4 is-drawer-close:hidden">
                         <input type="search"
-                               class="input input-bordered w-full"
+                               class="input w-full"
                                placeholder="Find items..."
                                value="@searchTerm"
                                @oninput="@FilterPanelMenu" />
                     </div>
+
+                    <!-- Menu -->
                     <div class="overflow-y-auto flex-1">
-                        <RlvMenu Class="w-full">
+                        <ul class="menu w-full">
                             @foreach (var category in menus)
                             {
-                                if (category.Children != null && category.Children.Count() > 0 && (HasChildPermission(category)))
+                                @if (HasPermission(category) || (category.Children != null && HasChildPermission(category)))
                                 {
-                                    <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
-                                        @if (category.Children != null && category.Children.Count() > 0)
-                                        {
-                                            @foreach (var menu in category.Children)
-                                            {
-                                                if (menu.Children != null && menu.Children.Count() > 0 && HasChildPermission(menu))
-                                                {
-                                                    <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu>
-                                                        @foreach (var child in menu.Children)
-                                                        {
-                                                            if (HasPermission(menu))
-                                                            {
-                                                                <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
-                                                            }
-                                                        }
-                                                    </NavigationItem>
-                                                }
-                                                else if (HasPermission(menu))
-                                                {
-                                                    <NavigationItem @key=menu @bind-Expanded=@menu.Expanded Example=@menu />
-                                                }
-                                            }
-                                        }
-                                    </NavigationItem>
-                                }
-                                else if (HasPermission(category))
-                                {
-                                    <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category></NavigationItem>
+                                    <li class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="@category.Name">
+                                        <a href="@category.Path" class="gap-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg>
+                                            <span class="is-drawer-close:hidden">@category.Name</span>
+                                        </a>
+                                    </li>
                                 }
                             }
-                        </RlvMenu>
+                        </ul>
+                    </div>
+
+                    <!-- Toggle Button -->
+                    <div class="p-2 border-t border-base-300">
+                        <label for="main-drawer" class="btn btn-ghost btn-circle w-full is-drawer-open:rotate-y-180 is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Expand">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z M9 4v16 M14 10l2 2l-2 2" />
+                            </svg>
+                        </label>
                     </div>
                 </Authorized>
             </AuthorizeView>

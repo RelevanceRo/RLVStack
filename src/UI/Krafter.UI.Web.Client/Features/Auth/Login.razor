@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @page "/Account/Login"
+@layout Krafter.UI.Web.Client.Common.Components.Layout.AuthLayout
 @using Krafter.Api.Client.Models
 @using Krafter.UI.Web.Client.Common.Components.DaisyUI
 @using Krafter.UI.Web.Client.Features.Auth
@@ -40,56 +41,50 @@
 
             <p class="text-center text-base my-4">Or</p>
 
-            <EditForm Model="@TokenRequestInput" OnValidSubmit="@(() => CreateToken(TokenRequestInput))" class="space-y-3">
+            <EditForm Model="@TokenRequestInput" OnValidSubmit="@(() => CreateToken(TokenRequestInput))" class="space-y-4">
                 <FluentValidationValidator Options="@(options => options.IncludeAllRuleSets())"/>
 
-                <div class="grid grid-cols-12 gap-4 items-center">
-                    <div class="col-span-12 md:col-span-2">
-                        <RlvLabel Text="Email" For="Email"/>
-                    </div>
-                    <div class="col-span-12 md:col-span-10">
-                        <RlvInputField @bind-Value="@TokenRequestInput.Email"
-                                       Name="Email"
-                                       Type="email"
-                                       Placeholder="Enter your email"
-                                       Class="w-full"/>
-                        <ValidationMessage class="text-sm text-error" For="@(() => TokenRequestInput.Email)"/>
-                    </div>
+                <div class="form-control w-full">
+                    <RlvLabel Text="Email" For="Email"/>
+                    <RlvInputField @bind-Value="@TokenRequestInput.Email"
+                                   Name="Email"
+                                   Type="email"
+                                   Placeholder="Enter your email"
+                                   Class="w-full mt-1"/>
+                    <ValidationMessage class="text-sm text-error mt-1" For="@(() => TokenRequestInput.Email)"/>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 items-center">
-                    <div class="col-span-12 md:col-span-2">
-                        <RlvLabel Text="Password" For="Password"/>
-                    </div>
-                    <div class="col-span-12 md:col-span-10">
-                        <RlvInputField @bind-Value="@TokenRequestInput.Password"
-                                       Name="Password"
-                                       Type="password"
-                                       Placeholder="Enter your password"
-                                       Class="w-full"/>
-                        <ValidationMessage class="text-sm text-error" For="@(() => TokenRequestInput.Password)"/>
-                    </div>
+                <div class="form-control w-full">
+                    <RlvLabel Text="Password" For="Password"/>
+                    <RlvInputField @bind-Value="@TokenRequestInput.Password"
+                                   Name="Password"
+                                   Type="password"
+                                   Placeholder="Enter your password"
+                                   Class="w-full mt-1"/>
+                    <ValidationMessage class="text-sm text-error mt-1" For="@(() => TokenRequestInput.Password)"/>
                 </div>
 
                 <div class="flex justify-start">
                     <RlvLink Href="/account/forgot-password" Text="Forgot Password?" />
                 </div>
 
-                <div class="flex flex-row justify-end gap-4 mt-8 mb-4">
+                <div class="flex justify-end mt-6">
                     <RlvButton Type="submit"
                                Color="ButtonColor.Primary"
                                Size="ButtonSize.Medium"
                                Disabled="@isBusy"
-                               Text="Login">
-                        @if (!isBusy)
+                               Wide="true">
+                        @if (isBusy)
                         {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                            </svg>
+                            <span class="loading loading-spinner loading-sm"></span>
+                            <span>Logging in...</span>
                         }
                         else
                         {
-                            <RlvLoading Size="LoadingSize.Small" Class="mr-2" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Login</span>
                         }
                     </RlvButton>
                 </div>
